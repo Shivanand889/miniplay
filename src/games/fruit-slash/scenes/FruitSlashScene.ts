@@ -315,40 +315,43 @@ export class FruitSlashScene extends Phaser.Scene {
 
     // Spawning waves of fruits & occasional bomb
     this.tossTimer += delta;
-    this.tossInterval = Math.max(900, 1800 - Math.floor(this.score / 2));
+    this.tossInterval = Math.max(1200, 2200 - Math.floor(this.score * 3));
     if (this.tossTimer > this.tossInterval) {
       this.tossTimer = 0;
       this.tossFruitWave();
     }
 
-    // Check missed fruits falling off the screen bottom
+    // Collect fruits to destroy (avoids mutating array mid-forEach)
+    const toDestroy: Phaser.Physics.Arcade.Sprite[] = [];
+
     this.fruitsGroup.getChildren().forEach((f: any) => {
       const fruit = f as Phaser.Physics.Arcade.Sprite;
+      if (!fruit.active || !fruit.body) return;
 
-      // Mark entry when fruit has reached the upper half of the screen
-      // (confirming it flew up properly and the player had a chance to slice it)
-      if (fruit.y < 500) {
-        fruit.setData('enteredScreen', true);
-      }
-
-      // Destroy and count as missed when fruit falls back down past the bottom
-      if (fruit.y > 730 && fruit.body && fruit.body.velocity.y > 0) {
-        if (fruit.getData('enteredScreen')) {
-          this.handleMissedFruit();
-        }
-        fruit.destroy();
+      // When a fruit is falling downward (velocity.y > 0) and reaches the bottom (y >= 710), it was missed!
+      if (fruit.y >= 710 && (fruit.body as Phaser.Physics.Arcade.Body).velocity.y > 0) {
+        toDestroy.push(fruit);
+        this.handleMissedFruit();
       }
     });
+
+    toDestroy.forEach(f => f.destroy());
 
     // Clean up sliced halves
+    const halvesToRemove: any[] = [];
     this.slicedGroup.getChildren().forEach((h: any) => {
-      if (h.y > 760) h.destroy();
+      if (h.active && h.y > 740) halvesToRemove.push(h);
     });
+    halvesToRemove.forEach(h => h.destroy());
 
     // Clean up fallen bombs (bombs falling off do NOT count as a miss)
+    const bombsToRemove: any[] = [];
     this.bombsGroup.getChildren().forEach((b: any) => {
-      if (b.y > 760) b.destroy();
+      if (b.active && b.y >= 720 && (b.body as Phaser.Physics.Arcade.Body)?.velocity.y > 0) {
+        bombsToRemove.push(b);
+      }
     });
+    bombsToRemove.forEach(b => b.destroy());
   }
 
   private tossFruitWave() {
@@ -356,37 +359,34 @@ export class FruitSlashScene extends Phaser.Scene {
     const fruitTypes = ['fruit_watermelon', 'fruit_orange', 'fruit_strawberry'];
 
     for (let i = 0; i < waveCount; i++) {
-      this.time.delayedCall(i * 150, () => {
+      this.time.delayedCall(i * 180, () => {
         if (!this.isGameActive || this.isGameOver || this.isPaused) return;
 
-        // Spawn near bottom-centre of canvas (always within camera view)
-        const x = Phaser.Math.Between(70, 410);
-        // Horizontal arc toward screen centre
-        const vx = (240 - x) * Phaser.Math.FloatBetween(0.6, 1.2);
-        // With gravity=1200, vy=-1700 → apex 1204px above spawn → y=710-1204=-494 (above screen top!)
-        const vy = Phaser.Math.Between(-1600, -2000);
+        const x = Phaser.Math.Between(80, 400);
+        // Gentle horizontal arc toward screen centre
+        const vx = (240 - x) * Phaser.Math.FloatBetween(0.35, 0.65);
+        // With gravity = 500, vy = -760 to -860 reaches y = 50 to 140 (top 15-20% of canvas!)
+        const vy = Phaser.Math.Between(-760, -860);
 
         const type = Phaser.Utils.Array.GetRandom(fruitTypes);
-        // Spawn at y=710 — bottom of the canvas but still inside camera view
-        const fruit = this.physics.add.sprite(x, 710, type);
+        const fruit = this.physics.add.sprite(x, 680, type);
         fruit.setData('type', type);
-        fruit.setData('enteredScreen', false);
         fruit.setVelocity(vx, vy);
-        fruit.setAngularVelocity(Phaser.Math.Between(-200, 200));
+        fruit.setAngularVelocity(Phaser.Math.Between(-140, 140));
         this.fruitsGroup.add(fruit);
       });
     }
 
-    // Chance to toss a bomb (only after some score)
+    // Chance to toss a bomb (only after score > 60)
     if (Math.random() < 0.28 && this.score > 60) {
-      this.time.delayedCall(250, () => {
+      this.time.delayedCall(280, () => {
         if (!this.isGameActive || this.isGameOver || this.isPaused) return;
         const bx = Phaser.Math.Between(100, 380);
-        const bvx = (240 - bx) * 0.85;
-        const bvy = Phaser.Math.Between(-1500, -1900);
-        const bomb = this.physics.add.sprite(bx, 710, 'bomb_explosive');
+        const bvx = (240 - bx) * 0.5;
+        const bvy = Phaser.Math.Between(-700, -800);
+        const bomb = this.physics.add.sprite(bx, 680, 'bomb_explosive');
         bomb.setVelocity(bvx, bvy);
-        bomb.setAngularVelocity(Phaser.Math.Between(-120, 120));
+        bomb.setAngularVelocity(Phaser.Math.Between(-100, 100));
         this.bombsGroup.add(bomb);
       });
     }
