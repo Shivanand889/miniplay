@@ -31,7 +31,7 @@ export const Footer: React.FC = () => {
               </span>
             </Link>
             <p className="text-xs text-text-muted leading-relaxed">
-              Play More. Beat Your Best. Instant-loading, high-octane online browser arcade games. Zero downloads, no installations, no logins required.
+              Play More. Beat Your Best. Free online mini games and browser arcade games. Play instantly on mobile or desktop with zero downloads and no sign-ups.
             </p>
           </div>
 
@@ -146,7 +146,7 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1">
-            <span>Crafted for 60 FPS browser arcade gameplay</span>
+            <span>Play free mini games &amp; browser arcade games instantly • 60 FPS Canvas</span>
           </div>
         </div>
       </div>

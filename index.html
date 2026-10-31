@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     <meta name="theme-color" content="#0B0F19" />
     
-    <!-- SEO Meta Tags -->
-    <title>MiniPlay - Free Online Arcade Games | Play More. Beat Your Best.</title>
-    <meta name="description" content="Play free online arcade games instantly on MiniPlay. No downloads, no installs, no sign-ups. Enjoy Traffic Racer, Neon Jump, Space Shooter, Endless Runner, Fruit Slash &amp; break high score records!" />
-    <meta name="keywords" content="online games, arcade games, free browser games, highway racer, neon jump, endless runner, space shooter, fruit slash, miniplay, html5 games" />
+    <!-- Primary SEO Meta Tags -->
+    <title>MiniPlay - Free Mini Games Online | Play Free Browser Games (No Download)</title>
+    <meta name="description" content="Play free mini games online instantly on MiniPlay. No downloads, no installs, and no sign-ups. Enjoy top browser arcade games like Traffic Racer, Fruit Slash, Neon Jump &amp; Space Shooter on mobile and desktop." />
+    <meta name="keywords" content="mini games, mini games online, free mini games, online games, free online games, play online games, arcade games, free arcade games, browser games, no download games, no sign up games, instant play games, fun games online, casual games, quick games, mobile browser games, games to play when bored, best free browser games" />
     <meta name="author" content="MiniPlay Arcade" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <link rel="canonical" href="https://www.playhere.space/" />
 
     <!-- Google AdSense Verification & Script -->
@@ -19,31 +20,164 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MiniPlay" />
     <meta property="og:url" content="https://www.playhere.space/" />
-    <meta property="og:title" content="MiniPlay - Play More. Beat Your Best." />
-    <meta property="og:description" content="Free online arcade games. Instant play on mobile and desktop. No downloads, no registrations." />
+    <meta property="og:title" content="MiniPlay - Free Mini Games Online | No Download, No Sign-Up" />
+    <meta property="og:description" content="Play free browser mini games instantly. No downloads, no registrations. 60 FPS arcade games for mobile and desktop." />
     <meta property="og:image" content="https://www.playhere.space/og-image.png" />
+    <meta property="og:image:alt" content="MiniPlay - Free Online Arcade Games" />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://www.playhere.space/" />
-    <meta property="twitter:title" content="MiniPlay - Play More. Beat Your Best." />
-    <meta property="twitter:description" content="Free online arcade games. Instant play on mobile and desktop. No downloads, no registrations." />
-    <meta property="twitter:image" content="https://www.playhere.space/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://www.playhere.space/" />
+    <meta name="twitter:title" content="MiniPlay - Free Mini Games Online | Play Free Browser Games" />
+    <meta name="twitter:description" content="Instant play arcade games on your phone or PC. No downloads, no sign-ups. High scores and daily challenges." />
+    <meta name="twitter:image" content="https://www.playhere.space/og-image.png" />
 
-    <!-- Structured Data (JSON-LD) for WebSite -->
+    <!-- Comprehensive Structured Data (JSON-LD) for SEO & AEO -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "MiniPlay",
-      "url": "https://www.playhere.space/",
-      "description": "Free online arcade games with instant browser play, high scores, and daily challenges.",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://www.playhere.space/games?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://www.playhere.space/#website",
+          "url": "https://www.playhere.space/",
+          "name": "MiniPlay",
+          "description": "Free online arcade mini games with instant browser play, high-score competition, and zero downloads.",
+          "inLanguage": "en-US",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.playhere.space/games?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://www.playhere.space/#organization",
+          "name": "MiniPlay Arcade",
+          "url": "https://www.playhere.space/",
+          "logo": "https://www.playhere.space/favicon.svg"
+        },
+        {
+          "@type": "ItemList",
+          "@id": "https://www.playhere.space/#games-list",
+          "name": "Featured Free Online Mini Games",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "VideoGame",
+                "name": "Traffic Racer",
+                "url": "https://www.playhere.space/games/traffic-racer",
+                "genre": ["Racing", "Arcade", "Endless"],
+                "gamePlatform": "Web Browser",
+                "applicationCategory": "BrowserGame",
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "VideoGame",
+                "name": "Fruit Slash",
+                "url": "https://www.playhere.space/games/fruit-slash",
+                "genre": ["Reflex", "Casual", "Arcade"],
+                "gamePlatform": "Web Browser",
+                "applicationCategory": "BrowserGame",
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "VideoGame",
+                "name": "Neon Jump",
+                "url": "https://www.playhere.space/games/neon-jump",
+                "genre": ["Platformer", "Arcade", "Vertical"],
+                "gamePlatform": "Web Browser",
+                "applicationCategory": "BrowserGame",
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "VideoGame",
+                "name": "Endless Runner",
+                "url": "https://www.playhere.space/games/endless-runner",
+                "genre": ["Runner", "Action", "Endless"],
+                "gamePlatform": "Web Browser",
+                "applicationCategory": "BrowserGame",
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "item": {
+                "@type": "VideoGame",
+                "name": "Space Shooter",
+                "url": "https://www.playhere.space/games/space-shooter",
+                "genre": ["Shooter", "Action", "Space"],
+                "gamePlatform": "Web Browser",
+                "applicationCategory": "BrowserGame",
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+              }
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://www.playhere.space/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What are some free mini games to play online?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Top free mini games to play online without downloading include Traffic Racer (highway speed racing), Fruit Slash (ninja fruit slicing combos), Neon Jump (endless vertical platformer), Endless Runner (3-lane obstacle dodging), and Space Shooter (retro arcade galaxy dogfights). All games run directly in modern web browsers on phone and desktop."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What are the best free browser games with no download?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The best free browser games requiring no download are HTML5 canvas games built on modern frameworks like Phaser 3. On MiniPlay, every game loads in under 2 seconds directly in Chrome, Safari, Edge, or Firefox without installs, plugins, or accounts."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What are good free games to play when bored?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "When you are bored and looking for quick entertainment, instant-play arcade games like Fruit Slash, Traffic Racer, and Neon Jump are ideal. They offer immediate gameplay, intuitive one-touch or keyboard controls, quick 2-to-3 minute sessions, and high-score challenges."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I play these fun mini games on my phone browser?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. All games on MiniPlay are specifically optimized for mobile touchscreens, supporting touch swipe, drag, and tap controls on iOS Safari and Android Chrome without downloading apps from an app store."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What are the best free arcade games online?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The best free online arcade games are fast-paced, reflex-testing titles featuring progressive difficulty, power-ups, and score competition. Popular titles include highway traffic dodgers, classic top-down space shooters, endless vertical platform jumpers, and blade slicing games."
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
 

@@ -61,8 +61,9 @@ export const AllGamesPage: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <SEOHead
-        title="All Free Online Arcade Games"
-        description="Browse our complete collection of fast, addictive, free browser arcade games. Play highway racing, vertical jumping, endless parkour, top-down space shooters, and fruit slasher games."
+        title="All Free Mini Games Online | Play Instant Browser Games"
+        description="Browse our full collection of free mini games online with zero downloads. Play highway racing, fruit slicing, vertical climbers, endless runners, and space arcade games instantly on phone or PC."
+        keywords="all mini games, free mini games online, free online games, browser games, no download games, casual games, arcade games, instant play games"
         canonicalUrl="https://www.playhere.space/games"
       />
 

@@ -11,8 +11,9 @@ export const CategoriesPage: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-12">
       <SEOHead
-        title="Arcade Game Categories & Genres"
-        description="Explore free online arcade game categories on MiniPlay. Browse Racing, Endless Runners, Arcade Classics, Top-Down Space Shooters, Reflex and Casual games."
+        title="Free Mini Game Categories | Browse Online Games by Genre"
+        description="Explore free online mini games by category on MiniPlay. Browse Racing, Endless Runners, Retro Arcade, Space Shooters, Reflex, and Casual games with instant browser play."
+        keywords="mini games categories, free mini games, arcade games online, racing games, reflex games, runner games, casual games, browser games"
         canonicalUrl="https://www.playhere.space/categories"
       />
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GAMES, CATEGORIES } from '../../config/games';
 import { GameCard } from '../../components/GameCard/GameCard';
@@ -12,21 +12,51 @@ import {
   Gamepad2,
   Sparkles,
   Zap,
-  ShieldCheck,
   Smartphone,
   Trophy,
   ArrowRight,
+  HelpCircle,
+  ChevronDown,
+  ChevronUp,
+  CheckCircle2,
+  Clock,
+  ShieldCheck,
 } from 'lucide-react';
 
+const HOME_FAQS = [
+  {
+    question: 'What are some free mini games to play online?',
+    answer: 'MiniPlay offers an instant-play arcade library of top free mini games to play online: Traffic Racer (high-speed highway dodging), Fruit Slash (ninja fruit slicing combos), Neon Jump (endless vertical platform bouncer), Endless Runner (fast 3-lane obstacle dodging), and Space Shooter (retro top-down galactic dogfights). Every game runs natively in modern web browsers on phone and desktop.'
+  },
+  {
+    question: 'What are the best free browser games with no download?',
+    answer: 'The best free browser games requiring zero downloads are lightweight HTML5 canvas arcade games. On MiniPlay, every game starts in under 2 seconds directly in Google Chrome, Apple Safari, Microsoft Edge, or Mozilla Firefox. You do not need to install APKs, download apps from an app store, or install browser plugins.'
+  },
+  {
+    question: 'What are good free games to play when bored?',
+    answer: 'When you are bored and looking for quick entertainment, instant-play casual games like Fruit Slash, Traffic Racer, and Neon Jump are ideal. They require no sign-ups or tutorials, feature immediate one-touch or keyboard controls, last 2-to-3 minutes per round, and let you challenge your personal best high score.'
+  },
+  {
+    question: 'Can I play these fun mini games on my phone browser?',
+    answer: 'Yes! All games on MiniPlay are mobile-responsive and built specifically for touchscreens. Whether you are using an iPhone on iOS Safari or an Android phone on Chrome, you can swipe, tap, and drag with fluid 60 FPS performance without downloading any mobile app.'
+  },
+  {
+    question: 'What are the best free arcade games online?',
+    answer: 'Top online arcade games focus on reflex-testing gameplay, progressive difficulty curves, high-score competition, and unlockable cosmetic upgrades. Our games feature responsive controls, local score persistence, and daily challenge replay incentives without paywalls or subscriptions.'
+  }
+];
+
 export const HomePage: React.FC = () => {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const featuredGame = GAMES.find(g => g.featured) || GAMES[0];
   const trendingGames = GAMES.filter(g => g.popular);
 
   return (
     <div className="space-y-14 sm:space-y-20 pb-12">
       <SEOHead
-        title="Play More. Beat Your Best."
-        description="Free online arcade games. Instant play on mobile and desktop. No downloads, no installs, no sign-ups. Break high scores in Traffic Racer, Neon Jump, Endless Runner & more!"
+        title="MiniPlay - Free Mini Games Online | Play Free Browser Games (No Download)"
+        description="Play free mini games online instantly on MiniPlay. No downloads, no installs, and no sign-ups. Enjoy top browser arcade games on phone and PC with zero wait."
+        keywords="mini games, mini games online, free mini games, online games, free online games, play online games, arcade games, free arcade games, browser games, no download games, no sign up games, instant play games, fun games online, casual games, quick games, mobile browser games, games to play when bored, best free browser games"
         canonicalUrl="https://www.playhere.space/"
       />
 
@@ -51,7 +81,7 @@ export const HomePage: React.FC = () => {
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary-light text-xs font-bold tracking-wide">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Free Online Arcade • No Downloads • Zero Wait</span>
+                <span>Free Mini Games Online • No Downloads • Instant Play</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1]">
@@ -62,7 +92,7 @@ export const HomePage: React.FC = () => {
               </h1>
 
               <p className="text-base sm:text-lg text-text-muted max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                Jump into exciting arcade games. Challenge yourself, break personal records, unlock rare cosmetic skins, and have fun instantly on any device.
+                Jump into exciting free browser games instantly with zero downloads, no installations, and no account sign-ups. Challenge yourself, break personal records, unlock custom skins, and enjoy quick casual games on your phone or PC.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
@@ -106,11 +136,12 @@ export const HomePage: React.FC = () => {
                 <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-dark-bg">
                   <img
                     src={featuredGame.thumbnail}
-                    alt={`${featuredGame.name} preview illustration`}
+                    alt={`${featuredGame.name} - Free Online Arcade Game`}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="eager"
                   />
                   <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-amber-500 font-bold text-black text-[11px] shadow-md">
-                    Featured of the Week
+                    Featured Mini Game
                   </div>
                 </div>
 
@@ -127,7 +158,7 @@ export const HomePage: React.FC = () => {
                   <Link
                     to={`/games/${featuredGame.slug}`}
                     className="p-3 rounded-xl bg-primary text-white shadow-glow-primary transition-transform group-hover:scale-110 shrink-0"
-                    aria-label={`Play ${featuredGame.name}`}
+                    aria-label={`Play ${featuredGame.name} online for free`}
                   >
                     <Play className="w-4 h-4 fill-white" />
                   </Link>
@@ -152,7 +183,7 @@ export const HomePage: React.FC = () => {
               <span>Trending Right Now</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-              Most Popular Arcade Games
+              Popular Free Mini Games Online
             </h2>
           </div>
           <Link
@@ -188,10 +219,10 @@ export const HomePage: React.FC = () => {
             <span>Discover by Genre</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-            Explore Arcade Categories
+            Explore Free Browser Games by Category
           </h2>
           <p className="text-xs sm:text-sm text-text-muted mt-2">
-            From high-speed highway traffic dodging to fruit slicing martial arts and deep space combat.
+            From high-speed highway traffic racing and ninja fruit slicing to endless vertical platform jumping and galactic space battles.
           </p>
         </div>
 
@@ -225,10 +256,10 @@ export const HomePage: React.FC = () => {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-              Complete Game Roster
+              Complete Mini Games Collection
             </h2>
             <p className="text-xs text-text-muted mt-1">
-              Every game is genuinely playable, mobile optimized, and saved locally.
+              Every arcade game is genuinely playable, mobile touch optimized, and saves scores locally in your browser.
             </p>
           </div>
         </div>
@@ -250,7 +281,7 @@ export const HomePage: React.FC = () => {
               </div>
               <h3 className="text-lg font-bold text-white">Zero Downloads, Instant Play</h3>
               <p className="text-xs text-text-muted leading-relaxed">
-                Click and play within 2 seconds. No APKs, no app stores, no account registration required. Your browser is the console.
+                Click and play within 2 seconds. No APKs, no app stores, and no account registration required. Your browser is the gaming console.
               </p>
             </div>
 
@@ -258,9 +289,9 @@ export const HomePage: React.FC = () => {
               <div className="w-12 h-12 rounded-2xl bg-secondary/20 text-secondary border border-secondary/30 flex items-center justify-center">
                 <Smartphone className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white">Mobile Touch First</h3>
+              <h3 className="text-lg font-bold text-white">Mobile Touch Optimized</h3>
               <p className="text-xs text-text-muted leading-relaxed">
-                Engineered specifically for smooth touch, swipe, and tilt controls on iOS Safari and Android Chrome, even on low-bandwidth networks.
+                Engineered specifically for smooth touch, swipe, and drag controls on iOS Safari and Android Chrome, even on lower-bandwidth mobile data.
               </p>
             </div>
 
@@ -270,9 +301,57 @@ export const HomePage: React.FC = () => {
               </div>
               <h3 className="text-lg font-bold text-white">Daily Streaks &amp; Skins</h3>
               <p className="text-xs text-text-muted leading-relaxed">
-                Earn arcade coins through gameplay to unlock custom car paints, spaceships, and ninja blades. Track consecutive daily visits.
+                Earn arcade coins through high-score gameplay to unlock custom car paints, starfighters, and samurai blades with local high-score saving.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AEO / Answer Engine FAQ Section (Direct answers for Google, Perplexity, ChatGPT) */}
+      <section aria-label="Frequently Asked Questions" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="rounded-3xl border border-dark-border bg-dark-card/60 p-6 sm:p-10 space-y-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary-light text-xs font-bold">
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>Questions &amp; Answers</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+              Frequently Asked Questions About Free Online Mini Games
+            </h2>
+            <p className="text-xs sm:text-sm text-text-muted">
+              Everything you need to know about playing free browser games on MiniPlay with zero downloads or accounts.
+            </p>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            {HOME_FAQS.map((faq, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div
+                  key={index}
+                  className="rounded-2xl border border-dark-border bg-dark-bg/60 overflow-hidden"
+                >
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                    className="w-full flex items-center justify-between p-4 sm:p-5 text-left font-semibold text-sm sm:text-base text-white hover:text-primary-light transition-colors"
+                    aria-expanded={isOpen}
+                  >
+                    <span>{faq.question}</span>
+                    {isOpen ? (
+                      <ChevronUp className="w-5 h-5 text-primary shrink-0 ml-2" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-text-muted shrink-0 ml-2" />
+                    )}
+                  </button>
+                  {isOpen && (
+                    <div className="px-4 sm:px-5 pb-5 text-xs sm:text-sm text-text-muted leading-relaxed border-t border-dark-border/40 pt-4">
+                      {faq.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

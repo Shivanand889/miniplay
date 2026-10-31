@@ -6,9 +6,9 @@ export const GAMES: GameDefinition[] = [
     slug: 'traffic-racer',
     name: 'Traffic Racer',
     tagline: 'Dodge heavy highway traffic at blistering speeds',
-    description: 'An addictive endless highway racing game where you maneuver through multi-lane traffic at breakneck speeds. Dodge sedans, trucks, and sports cars, collect highway coins, and overtake vehicles closely to maximize your bonus points.',
+    description: 'Traffic Racer is a fast-paced free mini game online where you maneuver a high-performance sports car through dense multi-lane highway traffic. Dodge trucks, buses, and speeding sedans at breakneck speed while collecting coins and executing close overtakes for high-score bonuses. It runs smoothly at 60 FPS in any desktop or mobile browser with zero downloads, no installations, and no sign-up required.',
     category: 'Racing',
-    tags: ['Racing', 'Car', 'Endless', 'High Speed', 'Reflex'],
+    tags: ['Mini Games', 'Free Games', 'Online Games', 'Racing', 'Arcade Games', 'Browser Games', 'No Download Games', 'Reflex'],
     thumbnail: '/images/games/traffic-racer.svg',
     featured: true,
     popular: true,
@@ -17,16 +17,16 @@ export const GAMES: GameDefinition[] = [
     releaseDate: '2025-01-10',
     controls: {
       desktop: [
-        'Arrow Left / A: Steer Left',
-        'Arrow Right / D: Steer Right',
+        'Arrow Left / A: Steer Left across highway lanes',
+        'Arrow Right / D: Steer Right across highway lanes',
         'Arrow Up / W: Nitro Acceleration boost',
-        'Arrow Down / S: Apply Brakes',
-        'Spacebar / P: Pause game',
+        'Arrow Down / S: Apply Brakes to avoid collisions',
+        'Spacebar / P: Pause game session',
       ],
       mobile: [
-        'Tap Left / Right half of screen to steer',
-        'Touch and drag your car across lanes',
-        'On-screen pause button',
+        'Tap Left / Right half of screen to steer car',
+        'Touch and drag your car across lanes smoothly',
+        'On-screen pause and sound toggle buttons',
       ],
     },
     rules: [
@@ -43,16 +43,16 @@ export const GAMES: GameDefinition[] = [
     ],
     faqs: [
       {
-        question: 'How do I unlock new racing cars?',
-        answer: 'Collect coins while racing on the highway. Once you reach 100 or 300 coins, visit the Car Garage in the game screen to unlock and equip new visual paint skins.'
+        question: 'How do you play Traffic Racer online with no download?',
+        answer: 'You can play Traffic Racer instantly in your web browser by navigating to MiniPlay on PC, Mac, iPhone, or Android. Click "Start Racing" to begin immediately with no app store downloads, installations, or registration required.'
       },
       {
-        question: 'Does the game get faster forever?',
-        answer: 'The speed scales smoothly and caps at an exhilarating terminal velocity, challenging your pure reflexes without becoming impossible.'
+        question: 'How do you unlock new racing cars and paint skins?',
+        answer: 'Earn gold coins by collecting them on the highway lanes and scoring close overtakes. Once you collect 100, 300, or 500 coins, open the Car Garage menu on the game screen to unlock and equip custom paint jobs like Neon Sapphire and Cyber Gold.'
       },
       {
-        question: 'Can I play Traffic Racer offline?',
-        answer: 'Yes! Once loaded in your browser, all game physics, assets, and sound effects run entirely locally without requiring server queries.'
+        question: 'What is the best strategy to get a high score in Traffic Racer?',
+        answer: 'Focus on staying near the center lanes where you have two escape routes. Look ahead to anticipate lane blockages, feather your brakes before tight gaps, and perform close overtakes at top speed to trigger big combo score multipliers.'
       }
     ],
     skins: [
@@ -67,9 +67,9 @@ export const GAMES: GameDefinition[] = [
     slug: 'neon-jump',
     name: 'Neon Jump',
     tagline: 'Bounce through neon skies and reach the stars',
-    description: 'An endless vertical jumping arcade sensation. Guide your bouncy neon character upward across static, moving, and disappearing platforms. Pick up super springs, avoid sudden drop-offs, and climb as high as humanly possible!',
+    description: 'Neon Jump is an endless vertical platform jumping game designed for quick, addictive browser play. Guide your cheerful neon character upward across static, horizontally moving, and fragile platforms while grabbing golden super springs for massive altitude boosts. Enjoy smooth physics and screen-wrapping mechanics on any phone or desktop without installing apps or creating accounts.',
     category: 'Arcade',
-    tags: ['Platformer', 'Vertical', 'Jumping', 'Neon', 'Casual'],
+    tags: ['Mini Games', 'Arcade Games', 'Free Online Games', 'Platformer', 'Vertical', 'Jumping', 'Casual Games', 'No Download Games'],
     thumbnail: '/images/games/neon-jump.svg',
     featured: false,
     popular: true,
@@ -80,21 +80,21 @@ export const GAMES: GameDefinition[] = [
       desktop: [
         'Arrow Left / A: Move Left',
         'Arrow Right / D: Move Right',
-        'Characters automatically jump when landing on platforms',
-        'Wrap-around screen: move off the left side to appear on the right',
+        'Character auto-bounces upon landing on any platform',
+        'Screen wrap: exit the left edge to reappear on the right edge',
       ],
       mobile: [
-        'Touch and drag left or right across screen',
-        'Responsive on-screen tilt/touch controls',
+        'Touch and drag left or right across the screen',
+        'Dedicated on-screen left and right touch steering buttons',
       ],
     },
     rules: [
       'Land on platforms to bounce higher into the sky.',
-      'Static green/blue platforms are stable and permanent.',
-      'Moving platforms oscillate horizontally—time your leap carefully.',
+      'Static cyan platforms are solid, stable, and permanent.',
+      'Moving purple platforms oscillate horizontally—time your leap carefully.',
       'Orange disappearing platforms shatter after a single bounce.',
       'Collect golden power springs for massive rocket jumps!',
-      'Falling off the bottom of the camera ends the game.',
+      'Falling below the bottom of the camera view ends the game.',
     ],
     tips: [
       'Take advantage of screen wrapping: exiting through the left border teleports you to the right border.',
@@ -103,12 +103,16 @@ export const GAMES: GameDefinition[] = [
     ],
     faqs: [
       {
-        question: 'What is the highest possible height in Neon Jump?',
-        answer: 'The sky is infinite! Procedural platform generation scales continuously as you climb thousands of meters high.'
+        question: 'Is Neon Jump a free browser game with no download?',
+        answer: 'Yes, Neon Jump is 100% free to play directly in your web browser. There are no downloads, zero waiting, and no account setup required. It loads in seconds on mobile Safari, Chrome, Edge, and Firefox.'
       },
       {
-        question: 'Do platforms disappear after I jump off them?',
-        answer: 'Only glowing orange warning platforms break upon contact. Regular neon platforms remain until scrolled past the bottom.'
+        question: 'How do you climb higher in Neon Jump without falling?',
+        answer: 'Master the screen-wrapping mechanic to teleport between screen edges, time your landings on the center of moving platforms, and prioritize grabbing golden springs which launch you dozens of meters upward safely.'
+      },
+      {
+        question: 'Do platforms disappear or move as you get higher?',
+        answer: 'Yes. As your altitude climbs past 100 meters, moving purple platforms and single-use fragile orange platforms appear more frequently, challenging your timing and spatial awareness.'
       }
     ],
     skins: [
@@ -123,9 +127,9 @@ export const GAMES: GameDefinition[] = [
     slug: 'endless-runner',
     name: 'Endless Runner',
     tagline: 'Sprint, slide, and leap across high-voltage tracks',
-    description: 'A 3-lane adrenaline-pumping endless running arcade game. Sprint through futuristic cyberpunk tracks, leap over electrified hurdles, slide under security barriers, and grab coin magnets to amass colossal scores.',
+    description: 'Endless Runner is an exhilarating 3-lane parkour mini game online that tests your split-second reflexes. Sprint across futuristic tracks, jump over electrified barriers, slide under overhead laser gates, and collect coin magnets and shields to survive as long as possible. Jump in instantly from any phone or PC browser with no sign-ups or downloads needed.',
     category: 'Endless Runner',
-    tags: ['Runner', 'Parkour', 'Fast Paced', 'Cyberpunk', 'Action'],
+    tags: ['Mini Games', 'Free Online Games', 'Runner', 'Parkour', 'Action Games', 'Browser Games', 'Quick Games', 'No Sign Up'],
     thumbnail: '/images/games/endless-runner.svg',
     featured: false,
     popular: true,
@@ -136,15 +140,14 @@ export const GAMES: GameDefinition[] = [
       desktop: [
         'Arrow Left / A: Switch to Left Lane',
         'Arrow Right / D: Switch to Right Lane',
-        'Arrow Up / W / Space: Jump over obstacles',
+        'Arrow Up / W / Spacebar: Jump over ground obstacles',
         'Arrow Down / S: Slide under overhead barriers',
       ],
       mobile: [
-        'Swipe Left: Move Left',
-        'Swipe Right: Move Right',
-        'Swipe Up: Jump',
-        'Swipe Down: Slide',
-        'Optional touch buttons on mobile viewports',
+        'Swipe Left: Switch to Left Lane',
+        'Swipe Right: Switch to Right Lane',
+        'Swipe Up: Jump over obstacles',
+        'Swipe Down: Slide under barriers',
       ],
     },
     rules: [
@@ -161,12 +164,16 @@ export const GAMES: GameDefinition[] = [
     ],
     faqs: [
       {
-        question: 'How long do power-ups last?',
-        answer: 'Coin magnets and Force Shields remain active for 8 seconds, clearly indicated by a countdown timer on your HUD.'
+        question: 'What is Endless Runner and how do I play for free?',
+        answer: 'Endless Runner is a free 3-lane browser arcade game where your character runs automatically. You switch lanes, jump over hurdles, and slide under barriers using arrow keys on desktop or swipe gestures on mobile without downloading anything.'
       },
       {
-        question: 'Does sliding make you invincible?',
-        answer: 'Sliding only allows you to pass under overhead beam barriers; ground hurdles still require a clean jump.'
+        question: 'How do power-ups work in Endless Runner?',
+        answer: 'Collect glowing power-up orbs on the track to activate special abilities: Gold Magnets automatically pull nearby coins into your wallet for 8 seconds, while Force Shields absorb one collision so you can keep running.'
+      },
+      {
+        question: 'Can I play Endless Runner on my mobile phone browser?',
+        answer: 'Yes! The game features full responsive touchscreen support. Simply swipe left, right, up, or down on your phone display in Safari or Chrome for seamless one-finger arcade gameplay.'
       }
     ],
     skins: [
@@ -181,9 +188,9 @@ export const GAMES: GameDefinition[] = [
     slug: 'space-shooter',
     name: 'Space Shooter',
     tagline: 'Defend the galaxy against relentless alien armadas',
-    description: 'A classic top-down retro-modern arcade space shooter. Command your starship against waves of alien invaders, collect plasma weapon power-ups, deploy emergency shields, and clash in epic boss encounters!',
+    description: 'Space Shooter is a classic retro-style top-down arcade shoot-em-up playable for free in any browser. Pilot an advanced starship through waves of enemy alien fighters, dodge plasma missiles, grab triple-shot weapon upgrades, and defeat titanic Dreadnought bosses. Enjoy fluid 60 FPS galactic action with instant browser loading and zero downloads on mobile or PC.',
     category: 'Shooting',
-    tags: ['Space', 'Shoot em up', 'Retro', 'Sci-Fi', 'Boss Battle'],
+    tags: ['Mini Games', 'Arcade Games', 'Shooting Games', 'Space Shooter', 'Retro Games', 'Browser Games', 'No Download Games'],
     thumbnail: '/images/games/space-shooter.svg',
     featured: false,
     popular: true,
@@ -192,7 +199,7 @@ export const GAMES: GameDefinition[] = [
     releaseDate: '2025-01-25',
     controls: {
       desktop: [
-        'Arrow Keys / WASD: Maneuver spaceship',
+        'Arrow Keys / WASD: Maneuver spaceship across screen',
         'Spacebar: Fire primary blasters (or hold for auto-fire)',
         'P / Esc: Pause mission',
       ],
@@ -215,12 +222,16 @@ export const GAMES: GameDefinition[] = [
     ],
     faqs: [
       {
-        question: 'How do boss battles trigger?',
-        answer: 'Every 500 points or 5 completed combat waves, a menacing mothership with multiple firing turrets warps into the sector.'
+        question: 'Is Space Shooter free to play with no sign up?',
+        answer: 'Yes! Space Shooter is completely free and requires no account creation, credit cards, or app downloads. Just launch the game page and start blasting alien fighters immediately.'
       },
       {
-        question: 'Do weapon upgrades wear off?',
-        answer: 'Upgrades last 12 seconds or until your ship takes hull damage.'
+        question: 'How do weapon upgrades and shields work in Space Shooter?',
+        answer: 'Defeated enemy commanders occasionally drop power-up capsules: collect "P" for wide Triple-Shot cannons, "L" for concentrated Laser Beams, and "S" for an energy shield that deflects incoming enemy fire.'
+      },
+      {
+        question: 'How do you beat the boss ships in Space Shooter?',
+        answer: 'Bosses appear every 5 waves. Keep your starfighter moving horizontally across the bottom of the screen, avoid the central turret laser, and continuously fire at the glowing core until the boss explodes.'
       }
     ],
     skins: [
@@ -235,9 +246,9 @@ export const GAMES: GameDefinition[] = [
     slug: 'fruit-slash',
     name: 'Fruit Slash',
     tagline: 'Slice juicy flying fruits and dodge explosive bombs',
-    description: 'An irresistibly addictive arcade slicing spectacle. Rapidly swipe or click-and-drag your blade across juicy flying watermelons, oranges, strawberries, bananas, and pineapples. Chain combo slices together while watching out for dangerous skull bombs!',
+    description: 'Fruit Slash is a wildly addictive fruit slicing arcade mini game that brings classic ninja slicing fun to your web browser. Swipe your finger or drag your mouse across flying watermelons, oranges, and strawberries to slice them in half while avoiding dangerous explosive bombs. Chain together rapid multi-fruit combos for massive point multipliers in this fast, free instant-play browser game.',
     category: 'Reflex',
-    tags: ['Fruit', 'Slicing', 'Ninja', 'Combos', 'Reflex', 'Casual'],
+    tags: ['Mini Games', 'Fruit Slash', 'Casual Games', 'Reflex Games', 'Free Online Games', 'Browser Games', 'Games to Play When Bored', 'Instant Play'],
     thumbnail: '/images/games/fruit-slash.svg',
     featured: false,
     popular: true,
@@ -258,8 +269,8 @@ export const GAMES: GameDefinition[] = [
       'Slice fruits before they drop off the bottom of the screen.',
       'Missing 3 fruits expends your 3 lives and concludes the round.',
       'NEVER slice black explosive skull bombs—detonating a bomb causes instant game over!',
-      'Slicing 3 or more fruits in a single swift blade stroke triggers Combo Multipliers (x2, x3, x5)!',
-      'Special Golden Dragonfruit awards +50 instant bonus points.',
+      'Slicing 3 or more fruits in a single swift blade stroke triggers Combo Multipliers (x3, x4, x5)!',
+      'Earn extra coins for big combos to unlock custom blades in the Armory.',
     ],
     tips: [
       'Wait for fruits to reach the apex of their trajectory when their movement momentarily slows down.',
@@ -268,12 +279,16 @@ export const GAMES: GameDefinition[] = [
     ],
     faqs: [
       {
-        question: 'How do combos work?',
-        answer: 'Slice 3 or more fruits in a single contiguous blade swipe (within 180 milliseconds) to unlock extra combo bonus points and vibrant text celebrations.'
+        question: 'How do you play Fruit Slash online for free with no download?',
+        answer: 'You can play Fruit Slash for free on MiniPlay directly inside Chrome, Safari, or Edge. Simply click "Enter Dojo" and use your mouse cursor on desktop or your finger on mobile to slice flying fruits across the screen.'
       },
       {
-        question: 'Does letting a bomb fall cause damage?',
-        answer: 'No! You only lose lives when good fruit drops unsliced. Bombs should always be allowed to harmlessly drop off screen.'
+        question: 'How do combo multipliers work in Fruit Slash?',
+        answer: 'When you slice 3, 4, or 5 fruits in a single continuous blade swipe within a split second, you trigger Combo Multipliers that award huge bonus points and extra coins for blade upgrades.'
+      },
+      {
+        question: 'What happens if you slice a bomb in Fruit Slash?',
+        answer: 'Slicing a black skull bomb causes an immediate explosion and instant game over. However, letting bombs drop off the bottom of the screen without touching them is completely safe and does not cost any lives.'
       }
     ],
     skins: [
