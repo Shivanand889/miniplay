@@ -1,15 +1,1 @@
-# MiniPlay Google AdSense ads.txt Configuration
-# ==============================================================================
-# INSTRUCTIONS FOR SITE OWNER:
-# When your site is approved by Google AdSense:
-# 1. Replace "pub-0000000000000000" below with your actual AdSense Publisher ID.
-#    You can find this in your Google AdSense account under Account > Settings > Account information.
-# 2. Upload or commit this file directly to the root of your domain (https://yourdomain.com/ads.txt).
-# 3. If you use third-party ad exchanges or resellers, append their authorized lines here.
-#
-# Format: <Field #1: Domain of exchange>, <Field #2: Publisher Account ID>, <Field #3: Relationship (DIRECT / RESELLER)>, <Field #4: Certification Authority ID (optional)>
-#
-# Example (Uncomment and replace with your actual ID once approved):
-# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
-#
-# NOTE: Advertisements are disabled by default until real credentials are provided.
+google.com, pub-7093235372695837, DIRECT, f08c47fec0942fa0

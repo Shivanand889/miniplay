@@ -24,10 +24,10 @@ export interface AdSenseConfig {
 }
 
 export const ADSENSE_CONFIG: AdSenseConfig = {
-  // Advertisements remain disabled until real credentials are provided
-  enabled: false,
-  testMode: true, // Shows non-intrusive preview outlines in dev mode
-  publisherId: 'ca-pub-0000000000000000', // Replace with verified AdSense ID
+  // Advertisements enabled with real AdSense publisher ID
+  enabled: true,
+  testMode: false,
+  publisherId: 'ca-pub-7093235372695837',
   slots: {
     homeHeroBanner: '0000000001',
     homeMidSection: '0000000002',
