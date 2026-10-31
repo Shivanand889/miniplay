@@ -158,19 +158,7 @@ export class NeonJumpScene extends Phaser.Scene {
     this.platforms = this.physics.add.group();
     this.springs = this.physics.add.group();
 
-    // Initial base platform directly below player
-    const basePlat = this.platforms.create(240, 640, 'plat_static');
-    (basePlat.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
-    basePlat.body.immovable = true;
-    basePlat.body.checkCollision.down = false;
-    basePlat.body.checkCollision.left = false;
-    basePlat.body.checkCollision.right = false;
-
-    // Spawn starting ladder of platforms up to Y = -400
-    while (this.highestPlatformY > -400) {
-      this.spawnPlatform(this.highestPlatformY);
-      this.highestPlatformY -= Phaser.Math.Between(75, 110);
-    }
+    this.buildInitialWorld();
 
     // Player setup - starts sitting on base platform with gravity paused until started!
     this.player = this.physics.add.sprite(240, 600, `jumper_${this.skin.id}`);
@@ -193,12 +181,46 @@ export class NeonJumpScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.springs, this.handleSpringLand, undefined, this);
   }
 
+  private buildInitialWorld() {
+    this.platforms.clear(true, true);
+    this.springs.clear(true, true);
+    this.highestPlatformY = 560;
+
+    // Initial base platform directly below player
+    const basePlat = this.platforms.create(240, 640, 'plat_static');
+    (basePlat.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    basePlat.body.immovable = true;
+    basePlat.body.checkCollision.down = false;
+    basePlat.body.checkCollision.left = false;
+    basePlat.body.checkCollision.right = false;
+
+    // Spawn starting ladder of platforms up to Y = -400
+    while (this.highestPlatformY > -400) {
+      this.spawnPlatform(this.highestPlatformY);
+      this.highestPlatformY -= Phaser.Math.Between(75, 110);
+    }
+  }
+
   public startGame() {
+    this.physics.resume();
     this.isGameActive = true;
     this.isGameOver = false;
     this.isPaused = false;
-    (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(true);
-    this.player.setVelocityY(-580);
+    this.score = 0;
+    this.maxHeight = 0;
+    this.cameras.main.scrollY = 0;
+    this.touchDirection = 0;
+
+    this.player.setPosition(240, 600);
+    if (this.player.body) {
+      const body = this.player.body as Phaser.Physics.Arcade.Body;
+      body.reset(240, 600);
+      body.enable = true;
+      body.setAllowGravity(true);
+      body.setVelocity(0, -580);
+    } else {
+      this.player.setVelocityY(-580);
+    }
     soundFx.playJump();
     this.callbacks.onGameStarted?.();
   }
@@ -376,6 +398,7 @@ export class NeonJumpScene extends Phaser.Scene {
   private handleGameOver() {
     this.isGameOver = true;
     this.isGameActive = false;
+    this.physics.pause();
     soundFx.playGameOver();
     const earnedCoins = Math.floor(this.score / 60);
     this.callbacks.onGameOver(this.score, earnedCoins);
@@ -394,9 +417,8 @@ export class NeonJumpScene extends Phaser.Scene {
   }
 
   public restartGame() {
-    this.scene.restart();
-    this.time.delayedCall(50, () => {
-      this.startGame();
-    });
+    this.physics.resume();
+    this.buildInitialWorld();
+    this.startGame();
   }
 }

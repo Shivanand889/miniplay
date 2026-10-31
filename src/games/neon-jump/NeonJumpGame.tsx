@@ -123,6 +123,7 @@ export const NeonJumpGame: React.FC = () => {
     setGameState('playing');
     setCurrentScore(0);
     setSessionCoins(0);
+    sceneRef.current?.resumeGame();
     sceneRef.current?.restartGame();
     analytics.trackGameReplayed(gameDef.id);
   };
