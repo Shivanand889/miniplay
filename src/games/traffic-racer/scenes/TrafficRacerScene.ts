@@ -19,6 +19,7 @@ export class TrafficRacerScene extends Phaser.Scene {
   private trafficGroup!: Phaser.Physics.Arcade.Group;
   private coinGroup!: Phaser.Physics.Arcade.Group;
 
+  public isGameActive = false;
   private isGameOver = false;
   private isPaused = false;
   private score = 0;
@@ -213,12 +214,26 @@ export class TrafficRacerScene extends Phaser.Scene {
     // Collisions
     this.physics.add.overlap(this.player, this.trafficGroup, this.handleCrash, undefined, this);
     this.physics.add.overlap(this.player, this.coinGroup, this.handleCollectCoin, undefined, this);
+  }
 
+  public startGame() {
+    this.isGameActive = true;
+    this.isGameOver = false;
+    this.isPaused = false;
+    this.score = 0;
+    this.coins = 0;
+    this.distanceTravelled = 0;
+    this.currentSpeed = this.baseSpeed;
+    this.trafficGroup.clear(true, true);
+    this.coinGroup.clear(true, true);
+    this.player.setPosition(240, 580);
+    this.player.setVelocity(0, 0);
+    this.player.clearTint();
     this.callbacks.onGameStarted?.();
   }
 
   update(time: number, delta: number) {
-    if (this.isGameOver || this.isPaused) return;
+    if (!this.isGameActive || this.isGameOver || this.isPaused) return;
 
     const dt = delta / 1000;
 
@@ -349,6 +364,7 @@ export class TrafficRacerScene extends Phaser.Scene {
   private handleCrash() {
     if (this.isGameOver) return;
     this.isGameOver = true;
+    this.isGameActive = false;
 
     soundFx.playCrash();
     soundFx.playExplosion();
@@ -403,6 +419,6 @@ export class TrafficRacerScene extends Phaser.Scene {
   }
 
   public restartGame() {
-    this.scene.restart();
+    this.startGame();
   }
 }

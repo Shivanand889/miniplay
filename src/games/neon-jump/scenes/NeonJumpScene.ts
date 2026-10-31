@@ -17,12 +17,12 @@ export class NeonJumpScene extends Phaser.Scene {
   private springs!: Phaser.Physics.Arcade.Group;
   private stars!: Phaser.GameObjects.Arc[];
 
+  public isGameActive = false;
   private isGameOver = false;
   private isPaused = false;
   private score = 0;
   private maxHeight = 0;
-  private highestY = 600;
-  private nextPlatformY = 560;
+  private highestPlatformY = 560;
 
   public touchDirection: number = 0; // -1 for left, 1 for right, 0 for none
 
@@ -71,7 +71,7 @@ export class NeonJumpScene extends Phaser.Scene {
       g.destroy();
     }
 
-    // 2. Static Platform (Cyan/Green)
+    // 2. Static Platform (Cyan/Green neon)
     if (!this.textures.exists('plat_static')) {
       const g = this.make.graphics({ x: 0, y: 0 });
       g.fillStyle(0x0891B2, 1);
@@ -84,7 +84,7 @@ export class NeonJumpScene extends Phaser.Scene {
       g.destroy();
     }
 
-    // 3. Moving Platform (Purple)
+    // 3. Moving Platform (Purple neon)
     if (!this.textures.exists('plat_moving')) {
       const g = this.make.graphics({ x: 0, y: 0 });
       g.fillStyle(0x7C3AED, 1);
@@ -105,7 +105,6 @@ export class NeonJumpScene extends Phaser.Scene {
       g.lineStyle(2, 0xFB923C, 1);
       g.strokeRoundedRect(2, 2, 86, 16, 8);
       g.fillStyle(0xFEF3C7, 0.9);
-      // Dashed line indicating fragile
       g.fillRect(14, 7, 12, 3);
       g.fillRect(38, 7, 12, 3);
       g.fillRect(62, 7, 12, 3);
@@ -131,23 +130,27 @@ export class NeonJumpScene extends Phaser.Scene {
   }
 
   create() {
+    this.isGameActive = false;
     this.isGameOver = false;
     this.isPaused = false;
     this.score = 0;
     this.maxHeight = 0;
-    this.highestY = 600;
-    this.nextPlatformY = 560;
+    this.highestPlatformY = 560;
 
     const width = 480;
     const height = 720;
 
+    // Reset Camera
+    this.cameras.main.scrollY = 0;
+
     // Cosmic background stars
     this.stars = [];
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 50; i++) {
       const x = Phaser.Math.Between(10, width - 10);
-      const y = Phaser.Math.Between(0, height);
+      const y = Phaser.Math.Between(-1000, height);
       const r = Phaser.Math.FloatBetween(1, 2.5);
       const star = this.add.circle(x, y, r, 0x38BDF8, Phaser.Math.FloatBetween(0.3, 0.8));
+      star.setScrollFactor(0.2); // Parallax starfield
       this.stars.push(star);
     }
 
@@ -156,24 +159,24 @@ export class NeonJumpScene extends Phaser.Scene {
     this.springs = this.physics.add.group();
 
     // Initial base platform directly below player
-    const basePlat = this.platforms.create(240, 650, 'plat_static');
+    const basePlat = this.platforms.create(240, 640, 'plat_static');
     basePlat.body.immovable = true;
     basePlat.body.checkCollision.down = false;
     basePlat.body.checkCollision.left = false;
     basePlat.body.checkCollision.right = false;
 
-    // Spawn starting ladder of platforms up to top of screen
-    while (this.nextPlatformY > -200) {
-      this.spawnPlatform(this.nextPlatformY);
-      this.nextPlatformY -= Phaser.Math.Between(75, 115);
+    // Spawn starting ladder of platforms up to Y = -400
+    while (this.highestPlatformY > -400) {
+      this.spawnPlatform(this.highestPlatformY);
+      this.highestPlatformY -= Phaser.Math.Between(75, 110);
     }
 
-    // Player setup
-    this.player = this.physics.add.sprite(240, 580, `jumper_${this.skin.id}`);
+    // Player setup - starts sitting on base platform with gravity paused until started!
+    this.player = this.physics.add.sprite(240, 600, `jumper_${this.skin.id}`);
     this.player.setBounce(0);
     this.player.setCollideWorldBounds(false);
     this.player.body?.setSize(28, 28);
-    this.player.setVelocityY(-450); // Initial jump boost
+    (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
 
     // Input
     if (this.input.keyboard) {
@@ -187,12 +190,20 @@ export class NeonJumpScene extends Phaser.Scene {
     // Platform Collisions (only when falling downwards)
     this.physics.add.overlap(this.player, this.platforms, this.handlePlatformLand, undefined, this);
     this.physics.add.overlap(this.player, this.springs, this.handleSpringLand, undefined, this);
+  }
 
+  public startGame() {
+    this.isGameActive = true;
+    this.isGameOver = false;
+    this.isPaused = false;
+    (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(true);
+    this.player.setVelocityY(-580);
+    soundFx.playJump();
     this.callbacks.onGameStarted?.();
   }
 
   update(time: number, delta: number) {
-    if (this.isGameOver || this.isPaused) return;
+    if (!this.isGameActive || this.isGameOver || this.isPaused) return;
 
     const dt = delta / 1000;
 
@@ -220,7 +231,7 @@ export class NeonJumpScene extends Phaser.Scene {
         const minX = plat.getData('minX');
         const maxX = plat.getData('maxX');
         const dir = plat.getData('dir');
-        const moveSpeed = plat.getData('speed') || 100;
+        const moveSpeed = plat.getData('speed') || 110;
         plat.x += dir * moveSpeed * dt;
 
         if (plat.x <= minX) {
@@ -233,55 +244,45 @@ export class NeonJumpScene extends Phaser.Scene {
       }
     });
 
-    // Camera scrolling upward smoothly when player climbs into upper half of screen
-    const thresholdY = 320;
-    if (this.player.y < thresholdY) {
-      const diff = thresholdY - this.player.y;
-      this.player.y = thresholdY;
+    // Camera scrolls upward smoothly as player climbs
+    const targetScrollY = this.player.y - 360;
+    if (targetScrollY < this.cameras.main.scrollY) {
+      this.cameras.main.scrollY = targetScrollY;
 
-      // Scroll all world elements down by diff
-      this.platforms.getChildren().forEach((p: any) => {
-        p.y += diff;
-      });
-      this.springs.getChildren().forEach((s: any) => {
-        s.y += diff;
-      });
+      // Score based on highest altitude climbed
+      const currentHeight = Math.max(0, Math.floor(-this.cameras.main.scrollY));
+      if (currentHeight > this.maxHeight) {
+        this.maxHeight = currentHeight;
+        this.score = Math.floor(this.maxHeight / 5);
+        this.callbacks.onScoreUpdate(this.score);
 
-      // Shift nextPlatformY down by diff
-      this.nextPlatformY += diff;
-
-      // Track height and score
-      this.maxHeight += Math.floor(diff);
-      this.score = Math.floor(this.maxHeight / 5);
-      this.callbacks.onScoreUpdate(this.score);
-
-      // Coins earned periodically every 100 points
-      const earnedCoins = Math.floor(this.score / 100);
-      this.callbacks.onCoinCollected(earnedCoins);
+        // Coins earned every 100 points
+        const earnedCoins = Math.floor(this.score / 100);
+        this.callbacks.onCoinCollected(earnedCoins);
+      }
     }
 
-    // Clean up platforms that have scrolled off the bottom
+    // Clean up platforms that have scrolled past the bottom of the visible camera
     this.platforms.getChildren().forEach((p: any) => {
-      if (p.y > 750) {
+      if (p.y > this.cameras.main.scrollY + 760) {
         p.destroy();
       }
     });
     this.springs.getChildren().forEach((s: any) => {
-      if (s.y > 750) {
+      if (s.y > this.cameras.main.scrollY + 760) {
         s.destroy();
       }
     });
 
-    // Procedurally spawn new platforms above the screen
-    while (this.nextPlatformY > -80) {
-      this.spawnPlatform(this.nextPlatformY);
-      // Distance between platforms scales gently with score
-      const spacing = Phaser.Math.Between(80, Math.min(145, 90 + Math.floor(this.score / 60)));
-      this.nextPlatformY -= spacing;
+    // Procedurally spawn new platforms above the camera view (infinite climber!)
+    while (this.highestPlatformY > this.cameras.main.scrollY - 300) {
+      this.spawnPlatform(this.highestPlatformY);
+      const spacing = Phaser.Math.Between(75, Math.min(130, 85 + Math.floor(this.score / 80)));
+      this.highestPlatformY -= spacing;
     }
 
-    // Check Fall Death (fell off bottom of screen)
-    if (this.player.y > 740 && !this.isGameOver) {
+    // Check Fall Death (fell off bottom of current camera view)
+    if (this.player.y > this.cameras.main.scrollY + 740 && !this.isGameOver) {
       this.handleGameOver();
     }
   }
@@ -293,10 +294,10 @@ export class NeonJumpScene extends Phaser.Scene {
     let texture = 'plat_static';
     let type = 'static';
 
-    if (rand < 0.28 && this.score > 80) {
+    if (rand < 0.28 && this.score > 60) {
       texture = 'plat_moving';
       type = 'moving';
-    } else if (rand < 0.45 && this.score > 150) {
+    } else if (rand < 0.45 && this.score > 120) {
       texture = 'plat_fragile';
       type = 'fragile';
     }
@@ -312,13 +313,16 @@ export class NeonJumpScene extends Phaser.Scene {
       plat.setData('minX', Math.max(50, x - 90));
       plat.setData('maxX', Math.min(430, x + 90));
       plat.setData('dir', Math.random() > 0.5 ? 1 : -1);
-      plat.setData('speed', Phaser.Math.Between(90, 160));
+      plat.setData('speed', Phaser.Math.Between(90, 150));
     }
 
     // Chance to spawn super spring on static platforms
     if (type === 'static' && Math.random() < 0.18) {
       const spring = this.springs.create(x, y - 16, 'power_spring');
       spring.body.immovable = true;
+      spring.body.checkCollision.down = false;
+      spring.body.checkCollision.left = false;
+      spring.body.checkCollision.right = false;
     }
   }
 
@@ -327,8 +331,8 @@ export class NeonJumpScene extends Phaser.Scene {
     const plat = platObj as Phaser.Physics.Arcade.Sprite;
 
     // Only bounce if falling downward and player's feet are above or near the platform top
-    if (p.body && p.body.velocity.y > 0 && p.y + 16 < plat.y + 12) {
-      p.setVelocityY(-560);
+    if (p.body && p.body.velocity.y > 0 && p.y + 14 < plat.y + 12) {
+      p.setVelocityY(-580);
       soundFx.playJump();
 
       // If fragile, break platform
@@ -352,7 +356,6 @@ export class NeonJumpScene extends Phaser.Scene {
       p.setVelocityY(-920); // Massive rocket bounce!
       soundFx.playPowerup();
 
-      // Spring compression bounce effect
       this.tweens.add({
         targets: spring,
         scaleY: 0.4,
@@ -368,6 +371,7 @@ export class NeonJumpScene extends Phaser.Scene {
 
   private handleGameOver() {
     this.isGameOver = true;
+    this.isGameActive = false;
     soundFx.playGameOver();
     const earnedCoins = Math.floor(this.score / 60);
     this.callbacks.onGameOver(this.score, earnedCoins);
@@ -387,5 +391,8 @@ export class NeonJumpScene extends Phaser.Scene {
 
   public restartGame() {
     this.scene.restart();
+    this.time.delayedCall(50, () => {
+      this.startGame();
+    });
   }
 }

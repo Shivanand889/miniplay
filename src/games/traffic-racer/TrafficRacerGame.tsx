@@ -103,7 +103,7 @@ export const TrafficRacerGame: React.FC = () => {
     setGameState('playing');
     setCurrentScore(0);
     setSessionCoins(0);
-    sceneRef.current?.restartGame();
+    sceneRef.current?.startGame();
     analytics.trackGameStarted(gameDef.id, gameDef.name);
   };
 

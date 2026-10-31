@@ -108,7 +108,7 @@ export const FruitSlashGame: React.FC = () => {
     setCurrentScore(0);
     setSessionCoins(0);
     setMisses(0);
-    sceneRef.current?.restartGame();
+    sceneRef.current?.startGame();
     analytics.trackGameStarted(gameDef.id, gameDef.name);
   };
 

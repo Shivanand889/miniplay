@@ -19,6 +19,7 @@ export class FruitSlashScene extends Phaser.Scene {
   private slicedGroup!: Phaser.Physics.Arcade.Group;
   private bombsGroup!: Phaser.Physics.Arcade.Group;
 
+  public isGameActive = false;
   private isGameOver = false;
   private isPaused = false;
   private score = 0;
@@ -30,7 +31,7 @@ export class FruitSlashScene extends Phaser.Scene {
   private tossInterval = 1800;
 
   // Combo system
-  private recentSlices: number[] = []; // timestamps of recent slices
+  private recentSlices: number[] = [];
 
   constructor(callbacks: GameBridgeCallbacks, skin: GameSkinConfig) {
     super({ key: 'FruitSlashScene' });
@@ -47,30 +48,30 @@ export class FruitSlashScene extends Phaser.Scene {
     if (!this.textures.exists('fruit_watermelon')) {
       const g = this.make.graphics({ x: 0, y: 0 });
       g.fillStyle(0x15803D, 1);
-      g.fillCircle(28, 28, 26);
+      g.fillCircle(30, 30, 28);
       g.fillStyle(0x166534, 1);
-      g.fillRect(10, 8, 4, 40);
-      g.fillRect(26, 6, 4, 44);
-      g.fillRect(42, 8, 4, 40);
-      g.generateTexture('fruit_watermelon', 56, 56);
+      g.fillRect(10, 8, 5, 44);
+      g.fillRect(27, 6, 6, 48);
+      g.fillRect(45, 8, 5, 44);
+      g.generateTexture('fruit_watermelon', 60, 60);
       g.destroy();
     }
 
-    // 2. Watermelon Half (Left & Right)
+    // 2. Watermelon Half
     if (!this.textures.exists('fruit_watermelon_half')) {
       const g = this.make.graphics({ x: 0, y: 0 });
       g.fillStyle(0x15803D, 1);
       g.beginPath();
-      g.arc(28, 28, 26, Math.PI / 2, (3 * Math.PI) / 2, false);
+      g.arc(30, 30, 28, Math.PI / 2, (3 * Math.PI) / 2, false);
       g.fillPath();
       g.fillStyle(0xEF4444, 1);
       g.beginPath();
-      g.arc(28, 28, 22, Math.PI / 2, (3 * Math.PI) / 2, false);
+      g.arc(30, 30, 23, Math.PI / 2, (3 * Math.PI) / 2, false);
       g.fillPath();
       g.fillStyle(0x000000, 1);
-      g.fillCircle(18, 20, 2);
-      g.fillCircle(18, 36, 2);
-      g.generateTexture('fruit_watermelon_half', 30, 56);
+      g.fillCircle(18, 22, 2.5);
+      g.fillCircle(18, 38, 2.5);
+      g.generateTexture('fruit_watermelon_half', 32, 60);
       g.destroy();
     }
 
@@ -78,12 +79,12 @@ export class FruitSlashScene extends Phaser.Scene {
     if (!this.textures.exists('fruit_orange')) {
       const g = this.make.graphics({ x: 0, y: 0 });
       g.fillStyle(0xF97316, 1);
-      g.fillCircle(24, 24, 22);
+      g.fillCircle(26, 26, 24);
       g.fillStyle(0xFDBA74, 1);
-      g.fillCircle(24, 24, 18);
+      g.fillCircle(26, 26, 20);
       g.fillStyle(0xEA580C, 1);
-      g.fillCircle(24, 24, 15);
-      g.generateTexture('fruit_orange', 48, 48);
+      g.fillCircle(26, 26, 16);
+      g.generateTexture('fruit_orange', 52, 52);
       g.destroy();
     }
 
@@ -91,13 +92,13 @@ export class FruitSlashScene extends Phaser.Scene {
     if (!this.textures.exists('fruit_strawberry')) {
       const g = this.make.graphics({ x: 0, y: 0 });
       g.fillStyle(0xDC2626, 1);
-      g.fillTriangle(20, 42, 4, 14, 36, 14);
-      g.fillCircle(12, 14, 8);
-      g.fillCircle(28, 14, 8);
+      g.fillTriangle(22, 46, 4, 16, 40, 16);
+      g.fillCircle(13, 16, 9);
+      g.fillCircle(31, 16, 9);
       // Leaves
       g.fillStyle(0x22C55E, 1);
-      g.fillTriangle(20, 4, 12, 14, 28, 14);
-      g.generateTexture('fruit_strawberry', 40, 46);
+      g.fillTriangle(22, 4, 14, 16, 30, 16);
+      g.generateTexture('fruit_strawberry', 44, 50);
       g.destroy();
     }
 
@@ -105,21 +106,21 @@ export class FruitSlashScene extends Phaser.Scene {
     if (!this.textures.exists('bomb_explosive')) {
       const g = this.make.graphics({ x: 0, y: 0 });
       g.fillStyle(0x18181B, 1);
-      g.fillCircle(26, 30, 22);
+      g.fillCircle(28, 32, 24);
       g.lineStyle(2, 0x52525B, 1);
-      g.strokeCircle(26, 30, 22);
+      g.strokeCircle(28, 32, 24);
       // Cap
       g.fillStyle(0x71717A, 1);
-      g.fillRect(22, 4, 8, 8);
+      g.fillRect(24, 4, 8, 8);
       // Spark
       g.fillStyle(0xF59E0B, 1);
-      g.fillCircle(26, 3, 4);
-      // Skull mark
+      g.fillCircle(28, 3, 5);
+      // Danger skull dots
       g.fillStyle(0xEF4444, 1);
-      g.fillCircle(21, 28, 3);
-      g.fillCircle(31, 28, 3);
-      g.fillRect(23, 36, 6, 3);
-      g.generateTexture('bomb_explosive', 52, 56);
+      g.fillCircle(22, 30, 3.5);
+      g.fillCircle(34, 30, 3.5);
+      g.fillRect(24, 39, 8, 3);
+      g.generateTexture('bomb_explosive', 56, 60);
       g.destroy();
     }
 
@@ -134,6 +135,7 @@ export class FruitSlashScene extends Phaser.Scene {
   }
 
   create() {
+    this.isGameActive = false;
     this.isGameOver = false;
     this.isPaused = false;
     this.score = 0;
@@ -160,9 +162,9 @@ export class FruitSlashScene extends Phaser.Scene {
     this.slicedGroup = this.physics.add.group();
     this.bombsGroup = this.physics.add.group();
 
-    // Slicing Pointer Input Handlers
+    // Pointer Input Handlers
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (this.isPaused || this.isGameOver) return;
+      if (!this.isGameActive || this.isPaused || this.isGameOver) return;
       if (pointer.isDown) {
         this.addBladePoint(pointer.x, pointer.y);
         this.checkSliceCollisions(pointer.x, pointer.y);
@@ -170,11 +172,24 @@ export class FruitSlashScene extends Phaser.Scene {
     });
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (this.isPaused || this.isGameOver) return;
+      if (!this.isGameActive || this.isPaused || this.isGameOver) return;
       this.addBladePoint(pointer.x, pointer.y);
       this.checkSliceCollisions(pointer.x, pointer.y);
     });
+  }
 
+  public startGame() {
+    this.isGameActive = true;
+    this.isGameOver = false;
+    this.isPaused = false;
+    this.score = 0;
+    this.coins = 0;
+    this.missedCount = 0;
+    this.fruitsGroup.clear(true, true);
+    this.slicedGroup.clear(true, true);
+    this.bombsGroup.clear(true, true);
+    // Toss first fruit wave after 300ms
+    this.tossTimer = this.tossInterval - 300;
     this.callbacks.onGameStarted?.();
   }
 
@@ -187,7 +202,7 @@ export class FruitSlashScene extends Phaser.Scene {
     // 1. Check Bombs (Explosion!)
     this.bombsGroup.getChildren().forEach((b: any) => {
       const bomb = b as Phaser.Physics.Arcade.Sprite;
-      if (bomb.active && Phaser.Math.Distance.Between(px, py, bomb.x, bomb.y) < 32) {
+      if (bomb.active && Phaser.Math.Distance.Between(px, py, bomb.x, bomb.y) < 36) {
         this.detonateBomb(bomb);
       }
     });
@@ -197,7 +212,7 @@ export class FruitSlashScene extends Phaser.Scene {
     // 2. Check Fruits
     this.fruitsGroup.getChildren().forEach((f: any) => {
       const fruit = f as Phaser.Physics.Arcade.Sprite;
-      if (fruit.active && Phaser.Math.Distance.Between(px, py, fruit.x, fruit.y) < 36) {
+      if (fruit.active && Phaser.Math.Distance.Between(px, py, fruit.x, fruit.y) < 40) {
         this.sliceFruit(fruit);
       }
     });
@@ -214,23 +229,23 @@ export class FruitSlashScene extends Phaser.Scene {
     // Juice splash particles
     const particleColor = type === 'fruit_orange' ? 0xF97316 : 0xEF4444;
     const emitter = this.add.particles(x, y, 'splat_drop', {
-      speed: { min: 100, max: 240 },
+      speed: { min: 120, max: 260 },
       scale: { start: 1.2, end: 0 },
       tint: particleColor,
       lifespan: 400,
-      quantity: 16,
+      quantity: 18,
     });
     this.time.delayedCall(450, () => emitter.destroy());
 
     // Spawn 2 separating halves
     const half1 = this.physics.add.sprite(x - 10, y, 'fruit_watermelon_half');
-    half1.setVelocity(-180, -100);
-    half1.setAngularVelocity(-240);
+    half1.setVelocity(-200, -120);
+    half1.setAngularVelocity(-260);
 
     const half2 = this.physics.add.sprite(x + 10, y, 'fruit_watermelon_half');
     half2.setFlipX(true);
-    half2.setVelocity(180, -100);
-    half2.setAngularVelocity(240);
+    half2.setVelocity(200, -120);
+    half2.setAngularVelocity(260);
 
     this.slicedGroup.add(half1);
     this.slicedGroup.add(half2);
@@ -238,7 +253,6 @@ export class FruitSlashScene extends Phaser.Scene {
     // Score & Combos
     const now = Date.now();
     this.recentSlices.push(now);
-    // Keep slices within 300ms
     this.recentSlices = this.recentSlices.filter(t => now - t <= 320);
 
     let pts = 10;
@@ -249,7 +263,7 @@ export class FruitSlashScene extends Phaser.Scene {
       this.showComboPopup(x, y, `COMBO ${comboMult}X! +${pts}`);
       this.coins += 2;
     } else {
-      if (Math.random() < 0.2) this.coins += 1;
+      if (Math.random() < 0.25) this.coins += 1;
     }
 
     this.score += pts;
@@ -260,6 +274,7 @@ export class FruitSlashScene extends Phaser.Scene {
   private detonateBomb(bomb: Phaser.Physics.Arcade.Sprite) {
     bomb.destroy();
     this.isGameOver = true;
+    this.isGameActive = false;
     soundFx.playExplosion();
     soundFx.playCrash();
     this.cameras.main.shake(400, 0.03);
@@ -291,9 +306,11 @@ export class FruitSlashScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number) {
-    if (this.isGameOver || this.isPaused) return;
+    if (!this.isGameActive || this.isGameOver || this.isPaused) {
+      this.bladeTrailGraphics.clear();
+      return;
+    }
 
-    // Render & fade out blade trail
     this.renderBladeTrail();
 
     // Spawning waves of fruits & occasional bomb
@@ -307,10 +324,18 @@ export class FruitSlashScene extends Phaser.Scene {
     // Check missed fruits falling off the screen bottom
     this.fruitsGroup.getChildren().forEach((f: any) => {
       const fruit = f as Phaser.Physics.Arcade.Sprite;
-      // If fruit has reached peak and dropped off bottom
-      if (fruit.y > 760 && fruit.body && fruit.body.velocity.y > 0) {
+
+      // Mark that fruit has entered the visible play area
+      if (fruit.y < 620) {
+        fruit.setData('enteredScreen', true);
+      }
+
+      // Check if it reached apex and fell below screen bottom
+      if (fruit.y > 740 && fruit.body && fruit.body.velocity.y > 0) {
+        if (fruit.getData('enteredScreen')) {
+          this.handleMissedFruit();
+        }
         fruit.destroy();
-        this.handleMissedFruit();
       }
     });
 
@@ -319,7 +344,7 @@ export class FruitSlashScene extends Phaser.Scene {
       if (h.y > 760) h.destroy();
     });
 
-    // Clean up fallen bombs (bombs falling off do NOT count as a miss!)
+    // Clean up fallen bombs (bombs falling off do NOT count as a miss)
     this.bombsGroup.getChildren().forEach((b: any) => {
       if (b.y > 760) b.destroy();
     });
@@ -330,16 +355,19 @@ export class FruitSlashScene extends Phaser.Scene {
     const fruitTypes = ['fruit_watermelon', 'fruit_orange', 'fruit_strawberry'];
 
     for (let i = 0; i < waveCount; i++) {
-      this.time.delayedCall(i * 120, () => {
-        if (this.isGameOver || this.isPaused) return;
+      this.time.delayedCall(i * 140, () => {
+        if (!this.isGameActive || this.isGameOver || this.isPaused) return;
 
-        const x = Phaser.Math.Between(70, 410);
-        const vx = (240 - x) * Phaser.Math.FloatBetween(0.8, 1.4);
-        const vy = Phaser.Math.Between(-780, -920);
+        const x = Phaser.Math.Between(80, 400);
+        // Trajectory arcing towards center
+        const vx = (240 - x) * Phaser.Math.FloatBetween(0.8, 1.3);
+        // Strong upward toss so fruits fly high into the upper screen!
+        const vy = Phaser.Math.Between(-940, -1120);
 
         const type = Phaser.Utils.Array.GetRandom(fruitTypes);
-        const fruit = this.physics.add.sprite(x, 740, type);
+        const fruit = this.physics.add.sprite(x, 700, type);
         fruit.setData('type', type);
+        fruit.setData('enteredScreen', false);
         fruit.setVelocity(vx, vy);
         fruit.setAngularVelocity(Phaser.Math.Between(-180, 180));
         this.fruitsGroup.add(fruit);
@@ -348,13 +376,13 @@ export class FruitSlashScene extends Phaser.Scene {
 
     // Chance to toss a bomb
     if (Math.random() < 0.28 && this.score > 60) {
-      this.time.delayedCall(200, () => {
-        if (this.isGameOver || this.isPaused) return;
-        const bx = Phaser.Math.Between(90, 390);
+      this.time.delayedCall(220, () => {
+        if (!this.isGameActive || this.isGameOver || this.isPaused) return;
+        const bx = Phaser.Math.Between(100, 380);
         const bvx = (240 - bx) * 0.9;
-        const bvy = Phaser.Math.Between(-750, -860);
+        const bvy = Phaser.Math.Between(-900, -1040);
 
-        const bomb = this.physics.add.sprite(bx, 740, 'bomb_explosive');
+        const bomb = this.physics.add.sprite(bx, 700, 'bomb_explosive');
         bomb.setVelocity(bvx, bvy);
         bomb.setAngularVelocity(Phaser.Math.Between(-120, 120));
         this.bombsGroup.add(bomb);
@@ -364,10 +392,12 @@ export class FruitSlashScene extends Phaser.Scene {
 
   private handleMissedFruit() {
     this.missedCount += 1;
-    soundFx.playHit?.();
+    soundFx.playHit();
+    this.callbacks.onScoreUpdate(this.score);
 
     if (this.missedCount >= this.maxMisses) {
       this.isGameOver = true;
+      this.isGameActive = false;
       soundFx.playGameOver();
       this.callbacks.onGameOver(this.score, this.coins);
     }
@@ -376,7 +406,6 @@ export class FruitSlashScene extends Phaser.Scene {
   private renderBladeTrail() {
     this.bladeTrailGraphics.clear();
     const now = Date.now();
-    // Keep trail points from the last 150ms
     this.bladePoints = this.bladePoints.filter(p => now - p.time < 160);
 
     if (this.bladePoints.length < 2) return;
@@ -390,11 +419,11 @@ export class FruitSlashScene extends Phaser.Scene {
       const alpha = 1 - age;
       const width = (1 - age) * 7;
 
-      // Glow stroke
+      // Outer glow
       this.bladeTrailGraphics.lineStyle(width + 4, bladeColor, alpha * 0.5);
       this.bladeTrailGraphics.lineBetween(p1.x, p1.y, p2.x, p2.y);
 
-      // Core white stroke
+      // Inner white core
       this.bladeTrailGraphics.lineStyle(Math.max(1, width - 2), 0xFFFFFF, alpha);
       this.bladeTrailGraphics.lineBetween(p1.x, p1.y, p2.x, p2.y);
     }
@@ -417,6 +446,6 @@ export class FruitSlashScene extends Phaser.Scene {
   }
 
   public restartGame() {
-    this.scene.restart();
+    this.startGame();
   }
 }

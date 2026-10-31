@@ -30,6 +30,7 @@ export class SpaceShooterScene extends Phaser.Scene {
   private bossMaxHealth = 30;
   private bossActive = false;
 
+  public isGameActive = false;
   private isGameOver = false;
   private isPaused = false;
   private score = 0;
@@ -258,16 +259,34 @@ export class SpaceShooterScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.enemiesGroup, this.handleShipCrash, undefined, this);
     this.physics.add.overlap(this.player, this.enemyLasers, this.handleShipHitByLaser, undefined, this);
     this.physics.add.overlap(this.player, this.powerupsGroup, this.handleCollectPowerup, undefined, this);
+  }
 
+  public startGame() {
+    this.isGameActive = true;
+    this.isGameOver = false;
+    this.isPaused = false;
+    this.score = 0;
+    this.coins = 0;
+    this.lives = 3;
+    this.weaponLevel = 1;
+    this.weaponTimer = 0;
+    this.hasShield = false;
+    this.boss = null;
+    this.bossActive = false;
+    this.bossHealth = 0;
+    this.playerLasers.clear(true, true);
+    this.enemyLasers.clear(true, true);
+    this.enemiesGroup.clear(true, true);
+    this.powerupsGroup.clear(true, true);
+    this.player.setPosition(240, 620);
+    this.player.clearTint();
     this.callbacks.onGameStarted?.();
   }
 
   update(time: number, delta: number) {
-    if (this.isGameOver || this.isPaused) return;
-
     const dt = delta / 1000;
 
-    // Parallax scrolling
+    // Parallax scrolling stars (always active for nice visual background)
     this.starsFar.forEach(s => {
       s.y += 60 * dt;
       if (s.y > 730) s.y = -10;
@@ -276,6 +295,8 @@ export class SpaceShooterScene extends Phaser.Scene {
       s.y += 140 * dt;
       if (s.y > 730) s.y = -10;
     });
+
+    if (!this.isGameActive || this.isGameOver || this.isPaused) return;
 
     // Player Keyboard Movement
     const speed = 360;
@@ -522,6 +543,7 @@ export class SpaceShooterScene extends Phaser.Scene {
 
     if (this.lives <= 0) {
       this.isGameOver = true;
+      this.isGameActive = false;
       soundFx.playGameOver();
       this.callbacks.onGameOver(this.score, this.coins);
     }
@@ -552,6 +574,6 @@ export class SpaceShooterScene extends Phaser.Scene {
   }
 
   public restartGame() {
-    this.scene.restart();
+    this.startGame();
   }
 }
