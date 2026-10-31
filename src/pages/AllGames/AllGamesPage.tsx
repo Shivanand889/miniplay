@@ -63,7 +63,7 @@ export const AllGamesPage: React.FC = () => {
       <SEOHead
         title="All Free Online Arcade Games"
         description="Browse our complete collection of fast, addictive, free browser arcade games. Play highway racing, vertical jumping, endless parkour, top-down space shooters, and fruit slasher games."
-        canonicalUrl="https://miniplay.pages.dev/games"
+        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev//games"
       />
 
       {/* Header */}

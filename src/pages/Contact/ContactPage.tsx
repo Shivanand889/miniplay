@@ -26,7 +26,7 @@ export const ContactPage: React.FC = () => {
       <SEOHead
         title="Contact Us"
         description="Get in touch with the MiniPlay team. Send feedback, report a gameplay bug, or ask questions."
-        canonicalUrl="https://miniplay.pages.dev/contact"
+        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev//contact"
       />
 
       <div className="border-b border-dark-border pb-6">

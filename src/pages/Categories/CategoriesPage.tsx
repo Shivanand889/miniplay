@@ -13,7 +13,7 @@ export const CategoriesPage: React.FC = () => {
       <SEOHead
         title="Arcade Game Categories & Genres"
         description="Explore free online arcade game categories on MiniPlay. Browse Racing, Endless Runners, Arcade Classics, Top-Down Space Shooters, Reflex and Casual games."
-        canonicalUrl="https://miniplay.pages.dev/categories"
+        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev//categories"
       />
 
       {/* Header */}

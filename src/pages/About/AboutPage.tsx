@@ -8,7 +8,7 @@ export const AboutPage: React.FC = () => {
       <SEOHead
         title="About Us"
         description="Learn about MiniPlay's mission to deliver instant, high-octane 60 FPS arcade gaming in the browser without downloads or sign-ups."
-        canonicalUrl="https://miniplay.pages.dev/about"
+        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev//about"
       />
 
       <div className="border-b border-dark-border pb-6">

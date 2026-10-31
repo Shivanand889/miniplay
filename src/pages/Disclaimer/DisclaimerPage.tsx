@@ -8,7 +8,7 @@ export const DisclaimerPage: React.FC = () => {
       <SEOHead
         title="Disclaimer & Advertising Disclosure"
         description="MiniPlay legal disclaimer, third-party advertising disclosures, and intellectual property notices."
-        canonicalUrl="https://miniplay.pages.dev/disclaimer"
+        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev//disclaimer"
       />
 
       <div className="border-b border-dark-border pb-6">
@@ -61,7 +61,7 @@ export const DisclaimerPage: React.FC = () => {
         <section className="space-y-3">
           <h2 className="text-lg font-bold text-white">5. Site Owner Information</h2>
           <p className="text-xs">
-            Website Domain: <code>https://miniplay.pages.dev</code><br />
+            Website Domain: <code>https://miniplay.shivanandgarg1234.workers.dev/</code><br />
             Administrator Contact: <code>[admin@yourdomain.com]</code>
           </p>
         </section>

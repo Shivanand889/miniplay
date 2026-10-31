@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://miniplay.pages.dev/sitemap.xml
+Sitemap: https://miniplay.shivanandgarg1234.workers.dev//sitemap.xml

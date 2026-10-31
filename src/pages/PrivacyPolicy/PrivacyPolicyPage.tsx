@@ -8,7 +8,7 @@ export const PrivacyPolicyPage: React.FC = () => {
       <SEOHead
         title="Privacy Policy"
         description="MiniPlay's Privacy Policy. Learn how we handle cookies, Google AdSense advertisements, Google Analytics, LocalStorage, and user privacy."
-        canonicalUrl="https://miniplay.pages.dev/privacy-policy"
+        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev//privacy-policy"
       />
 
       {/* Header */}
