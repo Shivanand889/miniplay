@@ -26,7 +26,7 @@ export const ContactPage: React.FC = () => {
       <SEOHead
         title="Contact Us"
         description="Get in touch with the MiniPlay team. Send feedback, report a gameplay bug, or ask questions."
-        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev/contact"
+        canonicalUrl="https://www.playhere.space/contact"
       />
 
       <div className="border-b border-dark-border pb-6">
@@ -141,7 +141,7 @@ export const ContactPage: React.FC = () => {
               <div>
                 <span className="font-semibold text-text-main block">Official Support Email:</span>
                 <span className="font-mono text-secondary">
-                  [contact@yourdomain.com]
+                  contact@playhere.space
                 </span>
                 <p className="text-[11px] text-text-subtle mt-0.5">
                   (Site Owner: update with your active email in Cloudflare environment or project config)

@@ -14,7 +14,7 @@ export const SEOHead: React.FC<SEOProps> = ({
   description,
   canonicalUrl = window.location.href,
   ogType = 'website',
-  ogImage = 'https://miniplay.shivanandgarg1234.workers.dev/og-image.png',
+  ogImage = 'https://www.playhere.space/og-image.png',
   structuredData,
 }) => {
   useEffect(() => {

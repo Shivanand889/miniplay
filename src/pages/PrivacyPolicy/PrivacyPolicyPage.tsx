@@ -8,7 +8,7 @@ export const PrivacyPolicyPage: React.FC = () => {
       <SEOHead
         title="Privacy Policy"
         description="MiniPlay's Privacy Policy. Learn how we handle cookies, Google AdSense advertisements, Google Analytics, LocalStorage, and user privacy."
-        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev/privacy-policy"
+        canonicalUrl="https://www.playhere.space/privacy-policy"
       />
 
       {/* Header */}
@@ -35,7 +35,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             Welcome to <strong>MiniPlay</strong> ("we", "our", or "us"). MiniPlay provides free online arcade games directly in web browsers without mandatory user registration, accounts, or application downloads. We respect your personal privacy and are committed to transparent data practices.
           </p>
           <p className="p-3 rounded-xl bg-dark-bg/80 border border-dark-border text-xs text-text-subtle">
-            <strong>Website Owner Note:</strong> Please replace placeholder information marked in brackets (such as <code>[contact@yourdomain.com]</code>) with your verified operational email address before commercial launch.
+            <strong>Website Owner Note:</strong> Please replace placeholder information marked in brackets (such as <code>contact@playhere.space</code>) with your verified operational email address before commercial launch.
           </p>
         </section>
 
@@ -123,7 +123,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             If you have questions regarding this Privacy Policy, our data practices, or cookie disclosures, please contact the site administrator at:
           </p>
           <div className="p-3.5 rounded-xl bg-dark-bg border border-dark-border text-xs text-text-main font-mono">
-            Email: [support@miniplay.pages.dev] or via our Contact Page.
+            Email: contact@playhere.space or via our Contact Page.
           </div>
         </section>
       </div>

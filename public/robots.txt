@@ -7,4 +7,4 @@ Allow: /
 User-agent: Googlebot
 Allow: /
 
-Sitemap: https://miniplay.shivanandgarg1234.workers.dev/sitemap.xml
+Sitemap: https://www.playhere.space/sitemap.xml

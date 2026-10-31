@@ -8,7 +8,7 @@ export const TermsPage: React.FC = () => {
       <SEOHead
         title="Terms and Conditions"
         description="MiniPlay Terms of Service and user agreement for playing free online arcade games."
-        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev/terms"
+        canonicalUrl="https://www.playhere.space/terms"
       />
 
       <div className="border-b border-dark-border pb-6">

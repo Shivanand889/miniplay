@@ -27,7 +27,7 @@ export const HomePage: React.FC = () => {
       <SEOHead
         title="Play More. Beat Your Best."
         description="Free online arcade games. Instant play on mobile and desktop. No downloads, no installs, no sign-ups. Break high scores in Traffic Racer, Neon Jump, Endless Runner & more!"
-        canonicalUrl="https://miniplay.shivanandgarg1234.workers.dev/"
+        canonicalUrl="https://www.playhere.space/"
       />
 
       {/* Top Banner Advertisement (Compliant placement above hero fold) */}
