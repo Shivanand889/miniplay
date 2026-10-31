@@ -160,6 +160,7 @@ export class NeonJumpScene extends Phaser.Scene {
 
     // Initial base platform directly below player
     const basePlat = this.platforms.create(240, 640, 'plat_static');
+    (basePlat.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     basePlat.body.immovable = true;
     basePlat.body.checkCollision.down = false;
     basePlat.body.checkCollision.left = false;
@@ -303,6 +304,8 @@ export class NeonJumpScene extends Phaser.Scene {
     }
 
     const plat = this.platforms.create(x, y, texture);
+    // CRITICAL: disable gravity so platforms don't fall!
+    (plat.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     plat.body.immovable = true;
     plat.body.checkCollision.down = false;
     plat.body.checkCollision.left = false;
@@ -319,6 +322,7 @@ export class NeonJumpScene extends Phaser.Scene {
     // Chance to spawn super spring on static platforms
     if (type === 'static' && Math.random() < 0.18) {
       const spring = this.springs.create(x, y - 16, 'power_spring');
+      (spring.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
       spring.body.immovable = true;
       spring.body.checkCollision.down = false;
       spring.body.checkCollision.left = false;

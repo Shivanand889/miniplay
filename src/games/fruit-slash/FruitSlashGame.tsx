@@ -80,7 +80,7 @@ export const FruitSlashGame: React.FC = () => {
       physics: {
         default: 'arcade',
         arcade: {
-          gravity: { x: 0, y: 1200 },
+          gravity: { x: 0, y: 600 },
           debug: false,
         },
       },
