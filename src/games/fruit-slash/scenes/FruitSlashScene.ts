@@ -15,9 +15,9 @@ export class FruitSlashScene extends Phaser.Scene {
   private bladeTrailGraphics!: Phaser.GameObjects.Graphics;
   private bladePoints: BladePoint[] = [];
 
-  private fruitsGroup!: Phaser.Physics.Arcade.Group;
-  private slicedGroup!: Phaser.Physics.Arcade.Group;
-  private bombsGroup!: Phaser.Physics.Arcade.Group;
+  private fruitsGroup!: Phaser.GameObjects.Group;
+  private slicedGroup!: Phaser.GameObjects.Group;
+  private bombsGroup!: Phaser.GameObjects.Group;
 
   public isGameActive = false;
   private isGameOver = false;
@@ -157,10 +157,10 @@ export class FruitSlashScene extends Phaser.Scene {
     // Blade Trail Graphics Layer
     this.bladeTrailGraphics = this.add.graphics();
 
-    // Groups
-    this.fruitsGroup = this.physics.add.group();
-    this.slicedGroup = this.physics.add.group();
-    this.bombsGroup = this.physics.add.group();
+    // Groups (GameObjects group to prevent PhysicsGroup defaults from resetting velocities)
+    this.fruitsGroup = this.add.group();
+    this.slicedGroup = this.add.group();
+    this.bombsGroup = this.add.group();
 
     // Pointer Input Handlers
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
@@ -239,16 +239,16 @@ export class FruitSlashScene extends Phaser.Scene {
 
     // Spawn 2 separating halves
     const half1 = this.physics.add.sprite(x - 10, y, 'fruit_watermelon_half');
-    half1.setVelocity(-200, -120);
-    half1.setAngularVelocity(-260);
-
     const half2 = this.physics.add.sprite(x + 10, y, 'fruit_watermelon_half');
     half2.setFlipX(true);
-    half2.setVelocity(200, -120);
-    half2.setAngularVelocity(260);
 
     this.slicedGroup.add(half1);
     this.slicedGroup.add(half2);
+
+    half1.setVelocity(-200, -120);
+    half1.setAngularVelocity(-260);
+    half2.setVelocity(200, -120);
+    half2.setAngularVelocity(260);
 
     // Score & Combos
     const now = Date.now();
@@ -328,8 +328,8 @@ export class FruitSlashScene extends Phaser.Scene {
       const fruit = f as Phaser.Physics.Arcade.Sprite;
       if (!fruit.active || !fruit.body) return;
 
-      // When a fruit is falling downward (velocity.y > 0) and reaches the bottom (y >= 710), it was missed!
-      if (fruit.y >= 710 && (fruit.body as Phaser.Physics.Arcade.Body).velocity.y > 0) {
+      // When a fruit is falling downward (velocity.y > 0) and reaches the bottom (y >= 700), it was missed!
+      if (fruit.y >= 700 && (fruit.body as Phaser.Physics.Arcade.Body).velocity.y > 0) {
         toDestroy.push(fruit);
         this.handleMissedFruit();
       }
@@ -347,7 +347,7 @@ export class FruitSlashScene extends Phaser.Scene {
     // Clean up fallen bombs (bombs falling off do NOT count as a miss)
     const bombsToRemove: any[] = [];
     this.bombsGroup.getChildren().forEach((b: any) => {
-      if (b.active && b.y >= 720 && (b.body as Phaser.Physics.Arcade.Body)?.velocity.y > 0) {
+      if (b.active && b.y >= 710 && (b.body as Phaser.Physics.Arcade.Body)?.velocity.y > 0) {
         bombsToRemove.push(b);
       }
     });
@@ -363,17 +363,18 @@ export class FruitSlashScene extends Phaser.Scene {
         if (!this.isGameActive || this.isGameOver || this.isPaused) return;
 
         const x = Phaser.Math.Between(80, 400);
-        // Horizontal arc toward screen centre
-        const vx = (240 - x) * Phaser.Math.FloatBetween(0.4, 0.7);
-        // Strong launch: vy between -1100 and -1320 soars right through the middle into the upper screen
-        const vy = Phaser.Math.Between(-1100, -1320);
+        // Inward horizontal arc toward screen centre
+        const vx = (240 - x) * Phaser.Math.FloatBetween(0.35, 0.65);
+        // vy = -780 to -920 launches fruit up to y = 80 to 220 (top 10% to 30% of canvas)
+        const vy = Phaser.Math.Between(-780, -920);
 
         const type = Phaser.Utils.Array.GetRandom(fruitTypes);
         const fruit = this.physics.add.sprite(x, 690, type);
         fruit.setData('type', type);
-        fruit.setVelocity(vx, vy);
-        fruit.setAngularVelocity(Phaser.Math.Between(-150, 150));
         this.fruitsGroup.add(fruit);
+        // Explicitly set physics velocity AFTER adding to group
+        fruit.setVelocity(vx, vy);
+        fruit.setAngularVelocity(Phaser.Math.Between(-140, 140));
       });
     }
 
@@ -382,12 +383,12 @@ export class FruitSlashScene extends Phaser.Scene {
       this.time.delayedCall(280, () => {
         if (!this.isGameActive || this.isGameOver || this.isPaused) return;
         const bx = Phaser.Math.Between(100, 380);
-        const bvx = (240 - bx) * 0.55;
-        const bvy = Phaser.Math.Between(-1000, -1200);
+        const bvx = (240 - bx) * 0.45;
+        const bvy = Phaser.Math.Between(-720, -840);
         const bomb = this.physics.add.sprite(bx, 690, 'bomb_explosive');
+        this.bombsGroup.add(bomb);
         bomb.setVelocity(bvx, bvy);
         bomb.setAngularVelocity(Phaser.Math.Between(-100, 100));
-        this.bombsGroup.add(bomb);
       });
     }
   }
