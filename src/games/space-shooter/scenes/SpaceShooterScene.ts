@@ -29,6 +29,13 @@ export class SpaceShooterScene extends Phaser.Scene {
   private bossHealth = 0;
   private bossMaxHealth = 30;
   private bossActive = false;
+  private nextBossScore = 500;
+  private bossCount = 0;
+
+  // Boss Health Bar UI Container
+  private bossHealthBarContainer!: Phaser.GameObjects.Container;
+  private bossHealthBarFill!: Phaser.GameObjects.Rectangle;
+  private bossHealthBarText!: Phaser.GameObjects.Text;
 
   public isGameActive = false;
   private isGameOver = false;
@@ -234,6 +241,27 @@ export class SpaceShooterScene extends Phaser.Scene {
     this.shieldGraphic.setStrokeStyle(2, 0x7DD3FC, 0.9);
     this.shieldGraphic.setVisible(false);
 
+    // Boss Health Bar UI Container (top center)
+    const barBg = this.add.rectangle(0, 0, 260, 14, 0x18181B, 0.85);
+    barBg.setStrokeStyle(1.5, 0xF43F5E, 0.9);
+    this.bossHealthBarFill = this.add.rectangle(-128, 0, 256, 10, 0xEF4444, 1);
+    this.bossHealthBarFill.setOrigin(0, 0.5);
+
+    this.bossHealthBarText = this.add.text(0, -16, '⚠️ DREADNOUGHT WARSHIP', {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '11px',
+      fontStyle: 'bold',
+      color: '#FDE047',
+    }).setOrigin(0.5);
+
+    this.bossHealthBarContainer = this.add.container(width / 2, 36, [
+      barBg,
+      this.bossHealthBarFill,
+      this.bossHealthBarText,
+    ]);
+    this.bossHealthBarContainer.setDepth(100);
+    this.bossHealthBarContainer.setVisible(false);
+
     // Keyboard
     if (this.input.keyboard) {
       this.cursors = this.input.keyboard.createCursorKeys();
@@ -274,6 +302,9 @@ export class SpaceShooterScene extends Phaser.Scene {
     this.boss = null;
     this.bossActive = false;
     this.bossHealth = 0;
+    this.nextBossScore = 500;
+    this.bossCount = 0;
+    this.bossHealthBarContainer?.setVisible(false);
     this.playerLasers.clear(true, true);
     this.enemyLasers.clear(true, true);
     this.enemiesGroup.clear(true, true);
@@ -333,44 +364,62 @@ export class SpaceShooterScene extends Phaser.Scene {
       this.firePlayerLaser();
     }
 
-    // Spawning Enemies
+    // Endless Spawning Enemies (scales with score)
     this.spawnTimer += delta;
-    const spawnRate = Math.max(600, 1400 - Math.floor(this.score / 2));
-    if (this.spawnTimer > spawnRate && !this.bossActive) {
+    const baseSpawnRate = Math.max(380, 1300 - Math.floor(this.score / 2.5));
+    // During boss battle, keep spawning occasional escorts so action never stops
+    const activeSpawnRate = this.bossActive ? 2000 : baseSpawnRate;
+
+    if (this.spawnTimer > activeSpawnRate) {
       this.spawnTimer = 0;
       this.spawnEnemy();
     }
 
-    // Trigger Boss at score thresholds (e.g. 500, 1200)
-    if (!this.bossActive && this.score >= 500 && this.bossHealth === 0) {
+    // Trigger Boss at score thresholds (e.g. 500, 1250, 2000, 2750...)
+    if (!this.bossActive && this.score >= this.nextBossScore) {
       this.spawnBoss();
     }
 
-    // Boss Movement & Firing
+    // Boss Hover, Sway & Firing (Stationary in upper arena - NEVER drifts off screen!)
     if (this.boss && this.boss.active) {
       if (this.boss.y < 120) {
-        this.boss.y += 60 * dt;
+        this.boss.y += 80 * dt;
       } else {
+        // Subtle floating hover wave
+        this.boss.y = 120 + Math.sin(time / 280) * 6;
+
         // Sway horizontally
         const dir = this.boss.getData('dir') || 1;
-        this.boss.x += dir * 100 * dt;
-        if (this.boss.x < 100) {
-          this.boss.x = 100;
+        const moveSpeed = 100 + Math.min(65, this.bossCount * 12);
+        this.boss.x += dir * moveSpeed * dt;
+        if (this.boss.x <= 95) {
+          this.boss.x = 95;
           this.boss.setData('dir', 1);
-        } else if (this.boss.x > 380) {
-          this.boss.x = 380;
+        } else if (this.boss.x >= 385) {
+          this.boss.x = 385;
           this.boss.setData('dir', -1);
         }
 
-        // Boss fire
+        // Boss firing cadence (gets faster in subsequent boss waves)
         const bFire = (this.boss.getData('fireTimer') || 0) + delta;
-        if (bFire > 800) {
+        const fireCadence = Math.max(520, 850 - this.bossCount * 40);
+        if (bFire > fireCadence) {
           this.boss.setData('fireTimer', 0);
           this.fireBossSpread(this.boss.x, this.boss.y + 40);
         } else {
           this.boss.setData('fireTimer', bFire);
         }
       }
+
+      // Update Health Bar Fill
+      const pct = Math.max(0, this.bossHealth / this.bossMaxHealth);
+      this.bossHealthBarFill.width = 256 * pct;
+    } else if (this.bossActive && (!this.boss || !this.boss.active)) {
+      // Fail-safe: ensure wave spawning can NEVER get permanently stuck!
+      this.bossActive = false;
+      this.boss = null;
+      this.nextBossScore = this.score + 750;
+      this.bossHealthBarContainer?.setVisible(false);
     }
 
     // Move & Cleanup Lasers
@@ -390,6 +439,11 @@ export class SpaceShooterScene extends Phaser.Scene {
     // Move & Cleanup Enemies
     this.enemiesGroup.getChildren().forEach((e: any) => {
       const enemy = e as Phaser.Physics.Arcade.Sprite;
+      if (!enemy.active) return;
+
+      // CRITICAL: Do NOT move the boss downward with regular enemy velocity!
+      if (enemy === this.boss) return;
+
       const vy = enemy.getData('vy') || 160;
       const vx = enemy.getData('vx') || 0;
       enemy.y += vy * dt;
@@ -437,7 +491,8 @@ export class SpaceShooterScene extends Phaser.Scene {
 
   private fireBossSpread(x: number, y: number) {
     soundFx.playLaser();
-    [-120, 0, 120].forEach(vx => {
+    const spreads = this.bossCount >= 3 ? [-150, -75, 0, 75, 150] : [-120, 0, 120];
+    spreads.forEach(vx => {
       const l = this.enemyLasers.create(x, y, 'laser_enemy');
       l.setData('vy', 260);
       l.setData('vx', vx);
@@ -446,27 +501,69 @@ export class SpaceShooterScene extends Phaser.Scene {
 
   private spawnEnemy() {
     const x = Phaser.Math.Between(40, 440);
-    const isGunship = Math.random() < 0.35 && this.score > 150;
+    const gunshipChance = Math.min(0.65, 0.25 + Math.min(0.4, this.score / 2000));
+    const isGunship = Math.random() < gunshipChance && this.score > 120;
     const type = isGunship ? 'enemy_gunship' : 'enemy_scout';
 
+    const speedBoost = Math.min(80, Math.floor(this.score / 35));
     const enemy = this.enemiesGroup.create(x, -50, type);
     enemy.setData('type', type);
-    enemy.setData('vy', isGunship ? 130 : 210);
+    enemy.setData('vy', (isGunship ? 130 : 210) + speedBoost);
     enemy.setData('vx', isGunship ? 0 : Phaser.Math.Between(-40, 40));
     enemy.setData('hp', isGunship ? 3 : 1);
   }
 
   private spawnBoss() {
     this.bossActive = true;
-    this.bossMaxHealth = 35;
+    this.bossCount += 1;
+    this.bossMaxHealth = 30 + this.bossCount * 15;
     this.bossHealth = this.bossMaxHealth;
 
-    this.boss = this.physics.add.sprite(240, -100, 'boss_dreadnought');
+    this.boss = this.physics.add.sprite(240, -90, 'boss_dreadnought');
+    this.boss.setData('type', 'boss');
     this.boss.setData('dir', 1);
     this.boss.setData('fireTimer', 0);
     this.enemiesGroup.add(this.boss);
 
+    const roman = this.getRomanNumeral(this.bossCount);
+    this.bossHealthBarText.setText(`⚠️ DREADNOUGHT WARSHIP MK-${roman}`);
+    this.bossHealthBarFill.width = 256;
+    this.bossHealthBarContainer.setVisible(true);
+
     soundFx.playPowerup();
+  }
+
+  private getRomanNumeral(num: number): string {
+    const romanMap: [number, string][] = [
+      [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+    ];
+    let result = '';
+    let n = num;
+    for (const [val, sym] of romanMap) {
+      while (n >= val) {
+        result += sym;
+        n -= val;
+      }
+    }
+    return result || `${num}`;
+  }
+
+  private createBossExplosion(x: number, y: number) {
+    for (let i = 0; i < 6; i++) {
+      this.time.delayedCall(i * 80, () => {
+        soundFx.playExplosion();
+        const offsetX = Phaser.Math.Between(-40, 40);
+        const offsetY = Phaser.Math.Between(-30, 30);
+        const boom = this.add.circle(x + offsetX, y + offsetY, 28, 0xEF4444, 0.9);
+        this.tweens.add({
+          targets: boom,
+          scale: 2.2,
+          alpha: 0,
+          duration: 350,
+          onComplete: () => boom.destroy(),
+        });
+      });
+    }
   }
 
   private handleLaserHitEnemy(laserObj: any, enemyObj: any) {
@@ -480,15 +577,25 @@ export class SpaceShooterScene extends Phaser.Scene {
 
       if (this.bossHealth <= 0) {
         // Boss Defeated!
+        this.createBossExplosion(this.boss.x, this.boss.y);
         this.boss.destroy();
         this.boss = null;
         this.bossActive = false;
-        soundFx.playExplosion();
-        this.score += 250;
+        this.bossHealthBarContainer.setVisible(false);
+
+        const bonus = 350 + this.bossCount * 100;
+        this.score += bonus;
         this.coins += 25;
         this.callbacks.onCoinCollected(this.coins);
         this.callbacks.onScoreUpdate(this.score);
-        this.cameras.main.shake(300, 0.02);
+        this.cameras.main.shake(400, 0.025);
+
+        // Schedule next boss (endless progression!)
+        this.nextBossScore = this.score + 750;
+
+        // Guaranteed powerup drop reward
+        this.powerupsGroup.create(200, 140, 'pow_weapon');
+        this.powerupsGroup.create(280, 140, 'pow_weapon');
       }
       return;
     }
@@ -518,6 +625,15 @@ export class SpaceShooterScene extends Phaser.Scene {
   }
 
   private handleShipCrash(playerObj: any, enemyObj: any) {
+    const enemy = enemyObj as Phaser.Physics.Arcade.Sprite;
+    if (enemy === this.boss) {
+      // Ramming the boss damages player and chips boss HP, but does NOT destroy the boss!
+      this.bossHealth = Math.max(0, this.bossHealth - 4);
+      this.takeDamage();
+      this.player.y = Math.min(650, this.player.y + 35);
+      return;
+    }
+
     enemyObj.destroy();
     this.takeDamage();
   }
