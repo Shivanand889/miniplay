@@ -325,13 +325,14 @@ export class FruitSlashScene extends Phaser.Scene {
     this.fruitsGroup.getChildren().forEach((f: any) => {
       const fruit = f as Phaser.Physics.Arcade.Sprite;
 
-      // Mark that fruit has entered the visible play area
-      if (fruit.y < 700) {
+      // Mark entry when fruit has reached the upper half of the screen
+      // (confirming it flew up properly and the player had a chance to slice it)
+      if (fruit.y < 500) {
         fruit.setData('enteredScreen', true);
       }
 
-      // Check if it reached apex and fell below screen bottom
-      if (fruit.y > 800 && fruit.body && fruit.body.velocity.y > 0) {
+      // Destroy and count as missed when fruit falls back down past the bottom
+      if (fruit.y > 730 && fruit.body && fruit.body.velocity.y > 0) {
         if (fruit.getData('enteredScreen')) {
           this.handleMissedFruit();
         }
@@ -355,35 +356,35 @@ export class FruitSlashScene extends Phaser.Scene {
     const fruitTypes = ['fruit_watermelon', 'fruit_orange', 'fruit_strawberry'];
 
     for (let i = 0; i < waveCount; i++) {
-      this.time.delayedCall(i * 140, () => {
+      this.time.delayedCall(i * 150, () => {
         if (!this.isGameActive || this.isGameOver || this.isPaused) return;
 
-        const x = Phaser.Math.Between(80, 400);
-        // Arc toward center horizontally
-        const vx = (240 - x) * Phaser.Math.FloatBetween(0.8, 1.3);
-        // Strong upward toss: with gravity=600, vy=-1300 peaks at y = 700 - (1300²/(2×600)) ≈ -710 (well above top!)
-        const vy = Phaser.Math.Between(-1300, -1600);
+        // Spawn near bottom-centre of canvas (always within camera view)
+        const x = Phaser.Math.Between(70, 410);
+        // Horizontal arc toward screen centre
+        const vx = (240 - x) * Phaser.Math.FloatBetween(0.6, 1.2);
+        // With gravity=1200, vy=-1700 → apex 1204px above spawn → y=710-1204=-494 (above screen top!)
+        const vy = Phaser.Math.Between(-1600, -2000);
 
         const type = Phaser.Utils.Array.GetRandom(fruitTypes);
-        // Spawn just below the visible canvas bottom
-        const fruit = this.physics.add.sprite(x, 760, type);
+        // Spawn at y=710 — bottom of the canvas but still inside camera view
+        const fruit = this.physics.add.sprite(x, 710, type);
         fruit.setData('type', type);
         fruit.setData('enteredScreen', false);
         fruit.setVelocity(vx, vy);
-        fruit.setAngularVelocity(Phaser.Math.Between(-180, 180));
+        fruit.setAngularVelocity(Phaser.Math.Between(-200, 200));
         this.fruitsGroup.add(fruit);
       });
     }
 
-    // Chance to toss a bomb
+    // Chance to toss a bomb (only after some score)
     if (Math.random() < 0.28 && this.score > 60) {
-      this.time.delayedCall(220, () => {
+      this.time.delayedCall(250, () => {
         if (!this.isGameActive || this.isGameOver || this.isPaused) return;
         const bx = Phaser.Math.Between(100, 380);
-        const bvx = (240 - bx) * 0.9;
-        const bvy = Phaser.Math.Between(-1200, -1500);
-
-        const bomb = this.physics.add.sprite(bx, 760, 'bomb_explosive');
+        const bvx = (240 - bx) * 0.85;
+        const bvy = Phaser.Math.Between(-1500, -1900);
+        const bomb = this.physics.add.sprite(bx, 710, 'bomb_explosive');
         bomb.setVelocity(bvx, bvy);
         bomb.setAngularVelocity(Phaser.Math.Between(-120, 120));
         this.bombsGroup.add(bomb);
