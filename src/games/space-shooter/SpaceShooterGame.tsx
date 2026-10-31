@@ -131,6 +131,7 @@ export const SpaceShooterGame: React.FC = () => {
     setCurrentScore(0);
     setSessionCoins(0);
     setLives(3);
+    sceneRef.current?.resumeGame();
     sceneRef.current?.restartGame();
     analytics.trackGameReplayed(gameDef.id);
   };

@@ -293,6 +293,7 @@ export class SpaceShooterScene extends Phaser.Scene {
     this.isGameActive = true;
     this.isGameOver = false;
     this.isPaused = false;
+    this.physics.resume();
     this.score = 0;
     this.coins = 0;
     this.lives = 3;
@@ -309,8 +310,19 @@ export class SpaceShooterScene extends Phaser.Scene {
     this.enemyLasers.clear(true, true);
     this.enemiesGroup.clear(true, true);
     this.powerupsGroup.clear(true, true);
+
     this.player.setPosition(240, 620);
+    this.player.setVelocity(0, 0);
     this.player.clearTint();
+    this.player.setVisible(true);
+    this.player.setActive(true);
+    if (this.player.body) {
+      const body = this.player.body as Phaser.Physics.Arcade.Body;
+      body.reset(240, 620);
+      body.enable = true;
+      body.setVelocity(0, 0);
+    }
+
     this.callbacks.onGameStarted?.();
   }
 
@@ -660,6 +672,7 @@ export class SpaceShooterScene extends Phaser.Scene {
     if (this.lives <= 0) {
       this.isGameOver = true;
       this.isGameActive = false;
+      this.physics.pause();
       soundFx.playGameOver();
       this.callbacks.onGameOver(this.score, this.coins);
     }
@@ -690,6 +703,7 @@ export class SpaceShooterScene extends Phaser.Scene {
   }
 
   public restartGame() {
+    this.physics.resume();
     this.startGame();
   }
 }

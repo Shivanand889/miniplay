@@ -220,6 +220,7 @@ export class TrafficRacerScene extends Phaser.Scene {
     this.isGameActive = true;
     this.isGameOver = false;
     this.isPaused = false;
+    this.physics.resume();
     this.score = 0;
     this.coins = 0;
     this.distanceTravelled = 0;
