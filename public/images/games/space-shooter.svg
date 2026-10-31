@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="deepSpace" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#1E1B4B"/>
+      <stop offset="60%" stop-color="#0B0F19"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="shipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#1E40AF"/>
+    </linearGradient>
+    <linearGradient id="alienGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F43F5E"/>
+      <stop offset="100%" stop-color="#881337"/>
+    </linearGradient>
+    <filter id="plasmaGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Deep Space Starfield -->
+  <rect width="600" height="400" fill="url(#deepSpace)"/>
+
+  <!-- Distant Stars & Nebula Clouds -->
+  <circle cx="120" cy="90" r="1.5" fill="#FFFFFF"/>
+  <circle cx="340" cy="50" r="2.5" fill="#38BDF8"/>
+  <circle cx="500" cy="140" r="1.5" fill="#F472B6"/>
+  <circle cx="210" cy="220" r="1.5" fill="#FFFFFF"/>
+  <circle cx="430" cy="310" r="2" fill="#FBBF24"/>
+  <ellipse cx="480" cy="80" rx="90" ry="40" fill="#6366F1" opacity="0.12" filter="url(#plasmaGlow)"/>
+
+  <!-- Alien Fleet (Top Enemies) -->
+  <g transform="translate(140, 70)">
+    <polygon points="30,0 60,35 45,45 30,30 15,45 0,35" fill="url(#alienGrad)" stroke="#FDA4AF" stroke-width="1.5"/>
+    <circle cx="30" cy="22" r="5" fill="#FEF08A" filter="url(#plasmaGlow)"/>
+  </g>
+  <g transform="translate(390, 70)">
+    <polygon points="30,0 60,35 45,45 30,30 15,45 0,35" fill="url(#alienGrad)" stroke="#FDA4AF" stroke-width="1.5"/>
+    <circle cx="30" cy="22" r="5" fill="#FEF08A" filter="url(#plasmaGlow)"/>
+  </g>
+
+  <!-- Big Alien Mothership Boss (Center Top) -->
+  <g transform="translate(240, 40)">
+    <polygon points="60,0 120,40 100,75 75,65 60,85 45,65 20,75 0,40" fill="#881337" stroke="#F43F5E" stroke-width="2.5" filter="url(#plasmaGlow)"/>
+    <circle cx="60" cy="40" r="14" fill="#FBBF24" stroke="#DC2626" stroke-width="2"/>
+    <circle cx="35" cy="50" r="6" fill="#F43F5E"/>
+    <circle cx="85" cy="50" r="6" fill="#F43F5E"/>
+  </g>
+
+  <!-- Laser Beams Fired by Player -->
+  <rect x="282" y="150" width="4" height="40" rx="2" fill="#38BDF8" filter="url(#plasmaGlow)"/>
+  <rect x="314" y="150" width="4" height="40" rx="2" fill="#38BDF8" filter="url(#plasmaGlow)"/>
+  <rect x="298" y="130" width="4" height="45" rx="2" fill="#A855F7" filter="url(#plasmaGlow)"/>
+
+  <!-- Enemy Plasma Missiles -->
+  <circle cx="280" cy="190" r="5" fill="#EF4444" filter="url(#plasmaGlow)"/>
+  <circle cx="330" cy="210" r="5" fill="#EF4444" filter="url(#plasmaGlow)"/>
+
+  <!-- Player Spaceship (Bottom Center) -->
+  <g transform="translate(260, 240)">
+    <!-- Thruster Fire Trail -->
+    <polygon points="40,95 34,130 46,130" fill="#38BDF8" filter="url(#plasmaGlow)"/>
+    <polygon points="40,95 37,115 43,115" fill="#FFFFFF"/>
+    <!-- Main Hull Wings -->
+    <polygon points="40,10 75,70 75,85 55,80 40,95 25,80 5,85 5,70" fill="url(#shipGrad)" stroke="#7DD3FC" stroke-width="2"/>
+    <!-- Cockpit Canopy -->
+    <ellipse cx="40" cy="48" rx="8" ry="18" fill="#0284C7" stroke="#E0F2FE" stroke-width="1.5" filter="url(#plasmaGlow)"/>
+    <!-- Wing Cannons -->
+    <rect x="10" y="60" width="5" height="22" rx="2" fill="#94A3B8"/>
+    <rect x="65" y="60" width="5" height="22" rx="2" fill="#94A3B8"/>
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="25" y="25" width="165" height="34" rx="8" fill="#182234" stroke="#6366F1" stroke-width="1.5"/>
+  <text x="36" y="48" font-family="'Outfit', sans-serif" font-size="15" font-weight="bold" fill="#F8FAFC">SPACE SHOOTER</text>
+</svg>

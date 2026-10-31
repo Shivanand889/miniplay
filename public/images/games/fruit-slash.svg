@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="slashBg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="60%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#0B0F19"/>
+    </radialGradient>
+    <linearGradient id="bladeTrail" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+    </linearGradient>
+    <filter id="fruitGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Wood Dojo / Dark Arcade Background -->
+  <rect width="600" height="400" fill="url(#slashBg)"/>
+
+  <!-- Dojo Plank Grid Lines (Subtle) -->
+  <line x1="0" y1="100" x2="600" y2="100" stroke="#1E293B" stroke-width="1.5" opacity="0.3"/>
+  <line x1="0" y1="200" x2="600" y2="200" stroke="#1E293B" stroke-width="1.5" opacity="0.3"/>
+  <line x1="0" y1="300" x2="600" y2="300" stroke="#1E293B" stroke-width="1.5" opacity="0.3"/>
+
+  <!-- Sliced Watermelon Half 1 (Top Left) -->
+  <g transform="translate(140, 100) rotate(-25)">
+    <path d="M 0,0 A 50,50 0 0,0 100,0 Z" fill="#15803D" stroke="#166534" stroke-width="3"/>
+    <path d="M 6,0 A 44,44 0 0,0 94,0 Z" fill="#F8FAFC"/>
+    <path d="M 12,0 A 38,38 0 0,0 88,0 Z" fill="#EF4444"/>
+    <!-- Seeds -->
+    <ellipse cx="32" cy="14" rx="2" ry="4" fill="#000000" transform="rotate(20 32 14)"/>
+    <ellipse cx="50" cy="22" rx="2" ry="4" fill="#000000"/>
+    <ellipse cx="68" cy="14" rx="2" ry="4" fill="#000000" transform="rotate(-20 68 14)"/>
+    <!-- Red Juice Splashes -->
+    <circle cx="110" cy="-10" r="4" fill="#EF4444" opacity="0.8"/>
+    <circle cx="120" cy="15" r="3" fill="#EF4444" opacity="0.7"/>
+  </g>
+
+  <!-- Sliced Watermelon Half 2 (Separating Downward) -->
+  <g transform="translate(190, 160) rotate(15)">
+    <path d="M 0,0 A 50,50 0 0,1 100,0 Z" fill="#15803D" stroke="#166534" stroke-width="3"/>
+    <path d="M 6,0 A 44,44 0 0,1 94,0 Z" fill="#F8FAFC"/>
+    <path d="M 12,0 A 38,38 0 0,1 88,0 Z" fill="#EF4444"/>
+    <ellipse cx="50" cy="-18" rx="2" ry="4" fill="#000000"/>
+  </g>
+
+  <!-- Luscious Orange (Right Side) -->
+  <g transform="translate(420, 140)">
+    <circle cx="40" cy="40" r="38" fill="#F97316" stroke="#C2410C" stroke-width="3"/>
+    <circle cx="40" cy="40" r="32" fill="#FED7AA"/>
+    <!-- Orange Segments -->
+    <circle cx="40" cy="40" r="28" fill="#FB923C"/>
+    <circle cx="40" cy="40" r="5" fill="#FED7AA"/>
+    <!-- Orange juice splash dots -->
+    <circle cx="85" cy="20" r="4" fill="#FB923C" opacity="0.8"/>
+    <circle cx="78" cy="70" r="3" fill="#FB923C" opacity="0.8"/>
+  </g>
+
+  <!-- Explosive Bomb (Warning! Danger!) -->
+  <g transform="translate(290, 240)">
+    <circle cx="35" cy="45" r="32" fill="#1E1E24" stroke="#475569" stroke-width="2"/>
+    <!-- Bomb Fuse Cap -->
+    <rect x="27" y="10" width="16" height="8" rx="2" fill="#64748B"/>
+    <!-- Burning Fuse & Spark -->
+    <path d="M 35,10 Q 40,-5 50,-8" stroke="#F59E0B" stroke-width="3" fill="none"/>
+    <polygon points="50,-8 54,-14 60,-8 54,-2" fill="#EF4444" filter="url(#fruitGlow)"/>
+    <circle cx="54" cy="-8" r="3" fill="#FEF08A"/>
+    <!-- Danger Skull Icon -->
+    <circle cx="30" cy="40" r="3" fill="#DC2626"/>
+    <circle cx="40" cy="40" r="3" fill="#DC2626"/>
+    <path d="M 31,50 L 39,50" stroke="#DC2626" stroke-width="2"/>
+  </g>
+
+  <!-- Dynamic Slicing Blade Trail (Arc across screen) -->
+  <path d="M 80,240 Q 280,120 540,80" stroke="url(#bladeTrail)" stroke-width="9" stroke-linecap="round" fill="none" filter="url(#fruitGlow)"/>
+  <path d="M 80,240 Q 280,120 540,80" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+  <!-- Combo Text Popup -->
+  <g transform="translate(230, 90)">
+    <text x="0" y="0" font-family="'Outfit', sans-serif" font-size="28" font-weight="900" fill="#FBBF24" filter="url(#fruitGlow)">COMBO 3X!</text>
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="25" y="25" width="150" height="34" rx="8" fill="#182234" stroke="#6366F1" stroke-width="1.5"/>
+  <text x="36" y="48" font-family="'Outfit', sans-serif" font-size="15" font-weight="bold" fill="#F8FAFC">FRUIT SLASH</text>
+</svg>
