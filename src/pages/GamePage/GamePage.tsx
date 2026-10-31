@@ -100,7 +100,7 @@ export const GamePage: React.FC = () => {
       <SEOHead
         title={`Play ${game.name} Free Online`}
         description={game.description}
-        canonicalUrl={`https://miniplay.shivanandgarg1234.workers.dev//games/${game.slug}`}
+        canonicalUrl={`https://miniplay.shivanandgarg1234.workers.dev/games/${game.slug}`}
         ogType="game"
         ogImage={game.thumbnail}
         structuredData={structuredData}
