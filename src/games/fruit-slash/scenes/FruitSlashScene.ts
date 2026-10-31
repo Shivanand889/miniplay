@@ -363,16 +363,16 @@ export class FruitSlashScene extends Phaser.Scene {
         if (!this.isGameActive || this.isGameOver || this.isPaused) return;
 
         const x = Phaser.Math.Between(80, 400);
-        // Gentle horizontal arc toward screen centre
-        const vx = (240 - x) * Phaser.Math.FloatBetween(0.35, 0.65);
-        // With gravity = 500, vy = -760 to -860 reaches y = 50 to 140 (top 15-20% of canvas!)
-        const vy = Phaser.Math.Between(-760, -860);
+        // Horizontal arc toward screen centre
+        const vx = (240 - x) * Phaser.Math.FloatBetween(0.4, 0.7);
+        // Strong launch: vy between -1100 and -1320 soars right through the middle into the upper screen
+        const vy = Phaser.Math.Between(-1100, -1320);
 
         const type = Phaser.Utils.Array.GetRandom(fruitTypes);
-        const fruit = this.physics.add.sprite(x, 680, type);
+        const fruit = this.physics.add.sprite(x, 690, type);
         fruit.setData('type', type);
         fruit.setVelocity(vx, vy);
-        fruit.setAngularVelocity(Phaser.Math.Between(-140, 140));
+        fruit.setAngularVelocity(Phaser.Math.Between(-150, 150));
         this.fruitsGroup.add(fruit);
       });
     }
@@ -382,9 +382,9 @@ export class FruitSlashScene extends Phaser.Scene {
       this.time.delayedCall(280, () => {
         if (!this.isGameActive || this.isGameOver || this.isPaused) return;
         const bx = Phaser.Math.Between(100, 380);
-        const bvx = (240 - bx) * 0.5;
-        const bvy = Phaser.Math.Between(-700, -800);
-        const bomb = this.physics.add.sprite(bx, 680, 'bomb_explosive');
+        const bvx = (240 - bx) * 0.55;
+        const bvy = Phaser.Math.Between(-1000, -1200);
+        const bomb = this.physics.add.sprite(bx, 690, 'bomb_explosive');
         bomb.setVelocity(bvx, bvy);
         bomb.setAngularVelocity(Phaser.Math.Between(-100, 100));
         this.bombsGroup.add(bomb);
