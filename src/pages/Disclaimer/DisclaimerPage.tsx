@@ -20,7 +20,7 @@ export const DisclaimerPage: React.FC = () => {
           Disclaimer
         </h1>
         <p className="text-xs text-text-muted mt-2">
-          Last Updated: October 2025
+          Last Updated: November 2025
         </p>
       </div>
 
@@ -62,7 +62,7 @@ export const DisclaimerPage: React.FC = () => {
           <h2 className="text-lg font-bold text-white">5. Site Owner Information</h2>
           <p className="text-xs">
             Website Domain: <code>https://www.playhere.space/</code><br />
-            Administrator Contact: <code>admin@playhere.space</code>
+            Administrator Contact: <a href="mailto:contact@playhere.space" className="text-secondary hover:underline">contact@playhere.space</a>
           </p>
         </section>
       </div>

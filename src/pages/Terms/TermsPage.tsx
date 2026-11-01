@@ -20,7 +20,7 @@ export const TermsPage: React.FC = () => {
           Terms &amp; Conditions
         </h1>
         <p className="text-xs text-text-muted mt-2">
-          Last Updated: October 2025
+          Last Updated: November 2025
         </p>
       </div>
 

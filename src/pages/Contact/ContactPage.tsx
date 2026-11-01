@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SEOHead } from '../../components/SEO/SEOHead';
-import { Mail, MessageSquare, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, MessageSquare, Send, CheckCircle2 } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -12,8 +12,14 @@ export const ContactPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name && email && message) {
+      const subjectLine = subject
+        ? encodeURIComponent(subject)
+        : encodeURIComponent('MiniPlay Contact Form');
+      const body = encodeURIComponent(
+        `Name: ${name}\nEmail: ${email}\n\n${message}`
+      );
+      window.location.href = `mailto:contact@playhere.space?subject=${subjectLine}&body=${body}`;
       setSubmitted(true);
-      // Reset form
       setName('');
       setEmail('');
       setSubject('');
@@ -140,12 +146,12 @@ export const ContactPage: React.FC = () => {
             <div className="space-y-3 text-xs text-text-muted">
               <div>
                 <span className="font-semibold text-text-main block">Official Support Email:</span>
-                <span className="font-mono text-secondary">
+                <a
+                  href="mailto:contact@playhere.space"
+                  className="font-mono text-secondary hover:underline"
+                >
                   contact@playhere.space
-                </span>
-                <p className="text-[11px] text-text-subtle mt-0.5">
-                  (Site Owner: update with your active email in Cloudflare environment or project config)
-                </p>
+                </a>
               </div>
 
               <div className="pt-2 border-t border-dark-border">
@@ -160,15 +166,6 @@ export const ContactPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-xs text-amber-200/80 space-y-2">
-            <div className="flex items-center gap-2 font-bold text-amber-400">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>Site Owner Information Notice</span>
-            </div>
-            <p className="leading-relaxed">
-              In accordance with Google AdSense quality guidelines, website owners should replace placeholder email handles with their verified domain email address upon going live.
-            </p>
-          </div>
         </div>
       </div>
     </div>

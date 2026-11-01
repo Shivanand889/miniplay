@@ -64,9 +64,15 @@ export const AboutPage: React.FC = () => {
 
         <section className="rounded-2xl border border-dark-border bg-dark-card/40 p-6 space-y-3">
           <h2 className="text-lg font-bold text-white">Site Operator &amp; Contact</h2>
-          <p className="text-xs">
-            MiniPlay is maintained by an independent arcade game development enthusiast team. For inquiries, business opportunities, or game feedback, reach out via our contact page.
+          <p className="text-xs text-text-muted leading-relaxed">
+            MiniPlay (<code>playhere.space</code>) is developed and maintained by an independent arcade game studio dedicated to high-quality, lightweight web gaming. We design all game mechanics, procedural graphics, and user interfaces to bring accessible, instant entertainment to players worldwide.
           </p>
+          <div className="pt-2 text-xs">
+            <span className="text-text-main font-semibold">Inquiries &amp; Support: </span>
+            <a href="mailto:contact@playhere.space" className="text-secondary hover:underline font-mono">
+              contact@playhere.space
+            </a>
+          </div>
         </section>
       </div>
     </div>

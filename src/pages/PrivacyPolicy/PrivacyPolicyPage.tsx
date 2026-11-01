@@ -21,7 +21,7 @@ export const PrivacyPolicyPage: React.FC = () => {
           Privacy Policy
         </h1>
         <p className="text-xs text-text-muted mt-2">
-          Last Updated: October 2025 • Effective immediately for all visitors
+          Last Updated: November 2025 • Effective immediately for all visitors
         </p>
       </div>
 
@@ -33,9 +33,6 @@ export const PrivacyPolicyPage: React.FC = () => {
           </h2>
           <p>
             Welcome to <strong>MiniPlay</strong> ("we", "our", or "us"). MiniPlay provides free online arcade games directly in web browsers without mandatory user registration, accounts, or application downloads. We respect your personal privacy and are committed to transparent data practices.
-          </p>
-          <p className="p-3 rounded-xl bg-dark-bg/80 border border-dark-border text-xs text-text-subtle">
-            <strong>Website Owner Note:</strong> Please replace placeholder information marked in brackets (such as <code>contact@playhere.space</code>) with your verified operational email address before commercial launch.
           </p>
         </section>
 
@@ -118,12 +115,26 @@ export const PrivacyPolicyPage: React.FC = () => {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white">7. Contacting Us</h2>
+          <h2 className="text-lg font-bold text-white">7. GDPR Rights for EEA and UK Users</h2>
+          <p>
+            If you are a resident of the European Economic Area (EEA) or the United Kingdom, you have certain data protection rights under the General Data Protection Regulation (GDPR). These include the right to access, rectify, or erase personal data, restrict processing, data portability, and the right to object to processing. Because MiniPlay does not maintain accounts or collect identifying personal data, your gameplay data remains solely within your browser's local storage, which you can erase directly at any time.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">8. CCPA/CPRA California Privacy Disclosures</h2>
+          <p>
+            Under the California Consumer Privacy Act (CCPA) and California Privacy Rights Act (CPRA), California residents have rights regarding their personal information. MiniPlay does not sell personal information, nor do we exchange user personal information for monetary or other consideration. Third-party advertising partners like Google may collect identifiers for personalized ad serving as detailed in Section 4.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-white">9. Contacting Us</h2>
           <p>
             If you have questions regarding this Privacy Policy, our data practices, or cookie disclosures, please contact the site administrator at:
           </p>
           <div className="p-3.5 rounded-xl bg-dark-bg border border-dark-border text-xs text-text-main font-mono">
-            Email: contact@playhere.space or via our Contact Page.
+            Email: <a href="mailto:contact@playhere.space" className="text-secondary hover:underline">contact@playhere.space</a> or reach us through our <a href="/contact" className="text-primary-light hover:underline">Contact Page</a>.
           </div>
         </section>
       </div>
