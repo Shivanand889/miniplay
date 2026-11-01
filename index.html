@@ -2,7 +2,16 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Favicon & Brand Icons (Google Search, Browser Tab, iOS, Android) -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     <meta name="theme-color" content="#0B0F19" />
     
@@ -25,7 +34,10 @@
     <meta property="og:title" content="MiniPlay - Free Mini Games Online | No Download, No Sign-Up" />
     <meta property="og:description" content="Play free browser mini games instantly. No downloads, no registrations. 60 FPS arcade games for mobile and desktop." />
     <meta property="og:image" content="https://www.playhere.space/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="MiniPlay - Free Online Arcade Games" />
+    <meta property="og:logo" content="https://www.playhere.space/logo.png" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -33,6 +45,7 @@
     <meta name="twitter:title" content="MiniPlay - Free Mini Games Online | Play Free Browser Games" />
     <meta name="twitter:description" content="Instant play arcade games on your phone or PC. No downloads, no sign-ups. High scores and daily challenges." />
     <meta name="twitter:image" content="https://www.playhere.space/og-image.png" />
+    <meta name="twitter:image:alt" content="MiniPlay - Free Online Arcade Games" />
 
     <!-- Comprehensive Structured Data (JSON-LD) for SEO & AEO -->
     <script type="application/ld+json">
@@ -57,7 +70,13 @@
           "@id": "https://www.playhere.space/#organization",
           "name": "MiniPlay Arcade",
           "url": "https://www.playhere.space/",
-          "logo": "https://www.playhere.space/favicon.svg"
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.playhere.space/logo.png",
+            "width": 1024,
+            "height": 1024
+          },
+          "image": "https://www.playhere.space/og-image.png"
         },
         {
           "@type": "ItemList",
