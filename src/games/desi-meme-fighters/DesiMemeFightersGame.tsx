@@ -5,6 +5,7 @@ import { FIGHTERS, FIGHTER_LIST } from './config/fighters';
 import { FighterDefinition, FighterId, GameScreen, DifficultyLevel, MatchRoundResult } from './types';
 import { StorageService } from '../../services/storage';
 import { fighterAudio } from './audio/FighterAudio';
+import { FighterAvatar } from './components/FighterAvatar';
 import {
   Swords,
   Play,
@@ -302,20 +303,15 @@ export const DesiMemeFightersGame: React.FC = () => {
               "Four legends. One arena. Unlimited drama."
             </p>
 
-            {/* 4 Mini Character Badges */}
+            {/* 4 Character Badges with Real Visual Avatars */}
             <div className="grid grid-cols-4 gap-2 pt-2">
               {FIGHTER_LIST.map(f => (
                 <div
                   key={f.id}
-                  className="p-2 rounded-xl border border-white/10 bg-white/5 flex flex-col items-center text-center space-y-1"
+                  className="p-1.5 rounded-xl border border-white/10 bg-white/5 flex flex-col items-center text-center space-y-1 hover:border-amber-400/40 transition-colors"
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center font-black text-sm text-white shadow-inner"
-                    style={{ backgroundColor: f.avatarColor }}
-                  >
-                    {f.name[0]}
-                  </div>
-                  <span className="text-[10px] font-bold leading-tight line-clamp-1">{f.name}</span>
+                  <FighterAvatar fighterId={f.id} size={48} />
+                  <span className="text-[10px] font-bold leading-tight line-clamp-1 text-white/90">{f.name}</span>
                 </div>
               ))}
             </div>
@@ -409,30 +405,30 @@ export const DesiMemeFightersGame: React.FC = () => {
                   key={f.id}
                   onClick={() => {
                     setSelectedPlayerId(f.id);
+                    // Ensure opponent is not the same fighter
+                    if (selectedOpponentId === f.id) {
+                      const other = FIGHTER_LIST.find(o => o.id !== f.id);
+                      if (other) setSelectedOpponentId(other.id);
+                    }
                     fighterAudio.playPunch();
                   }}
-                  className={`p-3 rounded-xl border text-left transition-all ${
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
                     isSelected
                       ? 'border-amber-400 bg-amber-500/20 shadow-glow-amber scale-[1.02]'
                       : 'border-white/10 bg-white/5 hover:border-white/20'
                   }`}
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-white text-xs"
-                      style={{ backgroundColor: f.avatarColor }}
-                    >
-                      {f.name[0]}
-                    </div>
-                    <div>
-                      <h3 className="font-extrabold text-xs text-white leading-tight">{f.name}</h3>
-                      <span className="text-[9px] text-amber-300 font-semibold">{f.title}</span>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <FighterAvatar fighterId={f.id} size={40} />
+                    <div className="min-w-0">
+                      <h3 className="font-extrabold text-xs text-white leading-tight truncate">{f.name}</h3>
+                      <span className="text-[9px] text-amber-300 font-semibold block truncate">{f.title}</span>
                     </div>
                   </div>
-                  <p className="text-[10px] text-white/70 line-clamp-1 italic mb-2">"{f.tagline}"</p>
+                  <p className="text-[10px] text-white/70 line-clamp-1 italic mb-1.5">"{f.tagline}"</p>
 
                   {/* Mini Stats */}
-                  <div className="space-y-1 text-[9px]">
+                  <div className="space-y-0.5 text-[9px]">
                     <div className="flex justify-between text-white/60">
                       <span>HP: {f.stats.health}</span>
                       <span>SPD: {f.stats.speed}</span>
@@ -448,21 +444,19 @@ export const DesiMemeFightersGame: React.FC = () => {
           </div>
 
           {/* Selected Fighter Detailed Preview */}
-          <div className="p-3.5 rounded-xl border border-white/10 bg-black/40 space-y-2">
-            <div className="flex items-center justify-between">
-              <div>
+          <div className="p-3 rounded-xl border border-white/10 bg-black/40 flex items-center gap-3">
+            <FighterAvatar fighterId={playerFighter.id} size={50} />
+            <div className="flex-1 min-w-0 space-y-1">
+              <div className="flex items-center justify-between">
                 <span className="text-xs font-black text-amber-400">{playerFighter.name}</span>
-                <p className="text-[10px] text-white/70">{playerFighter.concept}</p>
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200 font-bold uppercase">
+                  {playerFighter.specialMove.name}
+                </span>
               </div>
-              <div
-                className="px-2 py-1 rounded-md text-[10px] font-bold text-white uppercase"
-                style={{ backgroundColor: playerFighter.avatarColor }}
-              >
-                SPECIAL: {playerFighter.specialMove.name}
+              <p className="text-[10px] text-white/70 line-clamp-1">{playerFighter.concept}</p>
+              <div className="text-[9px] text-emerald-300 truncate">
+                <strong>Ult:</strong> {playerFighter.ultimateMove.name}
               </div>
-            </div>
-            <div className="text-[10px] text-emerald-300">
-              <strong>Ultimate:</strong> {playerFighter.ultimateMove.name} ({playerFighter.ultimateMove.cinematicLine})
             </div>
           </div>
 
@@ -481,97 +475,114 @@ export const DesiMemeFightersGame: React.FC = () => {
       )}
 
       {/* ------------------------------------------------------------- */}
-      {/* SCREEN 3: CHOOSE YOUR OPPONENT */}
+      {/* SCREEN 3: CHOOSE YOUR OPPONENT (Same fighter not allowed) */}
       {/* ------------------------------------------------------------- */}
-      {screen === 'select-opponent' && (
-        <div className="absolute inset-0 z-30 flex flex-col justify-between p-5 bg-gradient-to-b from-[#180B2E] via-[#24103E] to-[#0E061B] text-white">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+      {screen === 'select-opponent' && (() => {
+        const availableOpponents = FIGHTER_LIST.filter(f => f.id !== selectedPlayerId);
+        const currentOpponent = availableOpponents.some(f => f.id === selectedOpponentId)
+          ? FIGHTERS[selectedOpponentId]
+          : availableOpponents[0];
+
+        return (
+          <div className="absolute inset-0 z-30 flex flex-col justify-between p-5 bg-gradient-to-b from-[#180B2E] via-[#24103E] to-[#0E061B] text-white">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <button
+                onClick={() => setScreen('select-fighter')}
+                className="flex items-center gap-1 text-xs text-white/70 hover:text-white"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+              <h2 className="text-sm font-black tracking-wider uppercase text-red-400">
+                CHOOSE OPPONENT (AI)
+              </h2>
+              <div className="w-10" />
+            </div>
+
+            {/* Random Opponent Button */}
             <button
-              onClick={() => setScreen('select-fighter')}
-              className="flex items-center gap-1 text-xs text-white/70 hover:text-white"
+              onClick={() => {
+                const rand = availableOpponents[Math.floor(Math.random() * availableOpponents.length)];
+                setSelectedOpponentId(rand.id);
+                fighterAudio.playKick();
+              }}
+              className="py-2 rounded-xl bg-purple-600/30 border border-purple-500 text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-purple-600/40"
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Back</span>
+              <Sparkles className="w-3.5 h-3.5 text-purple-300" />
+              <span>PICK RANDOM OPPONENT</span>
             </button>
-            <h2 className="text-sm font-black tracking-wider uppercase text-red-400">
-              CHOOSE OPPONENT (AI)
-            </h2>
-            <div className="w-10" />
-          </div>
 
-          {/* Random Opponent Button */}
-          <button
-            onClick={() => {
-              const ids: FighterId[] = ['jaldi', 'pookie', 'guard', 'vadapav'];
-              const rand = ids[Math.floor(Math.random() * ids.length)];
-              setSelectedOpponentId(rand);
-              fighterAudio.playKick();
-            }}
-            className="py-2 rounded-xl bg-purple-600/30 border border-purple-500 text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-purple-600/40"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-purple-300" />
-            <span>PICK RANDOM OPPONENT</span>
-          </button>
-
-          {/* 4 Opponent Cards Grid */}
-          <div className="grid grid-cols-2 gap-2.5 my-2">
-            {FIGHTER_LIST.map(f => {
-              const isSelected = selectedOpponentId === f.id;
-              return (
-                <button
-                  key={f.id}
-                  onClick={() => {
-                    setSelectedOpponentId(f.id);
-                    fighterAudio.playPunch();
-                  }}
-                  className={`p-3 rounded-xl border text-left transition-all ${
-                    isSelected
-                      ? 'border-red-500 bg-red-600/20 shadow-glow-rose scale-[1.02]'
-                      : 'border-white/10 bg-white/5 hover:border-white/20'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-white text-xs"
-                      style={{ backgroundColor: f.avatarColor }}
+            {/* 3 Available Opponents (Same Fighter Disallowed) */}
+            <div className="space-y-2 my-2">
+              <span className="text-[10px] text-white/50 block font-semibold uppercase tracking-wider">
+                Select Rival (3 available):
+              </span>
+              <div className="grid grid-cols-1 gap-2">
+                {availableOpponents.map(f => {
+                  const isSelected = selectedOpponentId === f.id;
+                  return (
+                    <button
+                      key={f.id}
+                      onClick={() => {
+                        setSelectedOpponentId(f.id);
+                        fighterAudio.playPunch();
+                      }}
+                      className={`p-2.5 rounded-xl border flex items-center gap-3 text-left transition-all ${
+                        isSelected
+                          ? 'border-red-500 bg-red-600/20 shadow-glow-rose scale-[1.01]'
+                          : 'border-white/10 bg-white/5 hover:border-white/20'
+                      }`}
                     >
-                      {f.name[0]}
-                    </div>
-                    <div>
-                      <h3 className="font-extrabold text-xs text-white leading-tight">{f.name}</h3>
-                      <span className="text-[9px] text-red-300 font-semibold">{f.title}</span>
-                    </div>
-                  </div>
-                  <div className="text-[9px] text-white/60">
-                    <div>HP: {f.stats.health} • ATK: {f.stats.attack}</div>
-                    <div className="italic text-white/70 line-clamp-1 mt-1">"{f.tagline}"</div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                      <FighterAvatar fighterId={f.id} size={44} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-extrabold text-xs text-white truncate">{f.name}</h3>
+                          <span className="text-[9px] text-red-300 font-semibold">{f.title}</span>
+                        </div>
+                        <p className="text-[10px] text-white/70 italic truncate">"{f.tagline}"</p>
+                        <div className="text-[9px] text-white/50 pt-0.5">
+                          HP: {f.stats.health} • ATK: {f.stats.attack} • DEF: {f.stats.defence} • SPD: {f.stats.speed}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-          {/* Matchup Summary Preview */}
-          <div className="p-3 rounded-xl border border-white/10 bg-black/40 flex items-center justify-between text-xs">
-            <div className="text-amber-400 font-bold">YOU: {playerFighter.name}</div>
-            <div className="font-black text-red-500 px-2 py-0.5 rounded bg-red-950 border border-red-800">VS</div>
-            <div className="text-rose-400 font-bold">AI: {oppFighter.name}</div>
-          </div>
+            {/* Matchup Summary Preview */}
+            <div className="p-2.5 rounded-xl border border-white/10 bg-black/50 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <FighterAvatar fighterId={playerFighter.id} size={30} showBorder={false} />
+                <span className="text-amber-400 font-bold truncate">YOU: {playerFighter.name}</span>
+              </div>
+              <div className="font-black text-red-400 px-2 py-0.5 rounded bg-red-950 border border-red-800 text-[10px] shrink-0 mx-2">
+                VS
+              </div>
+              <div className="flex items-center gap-2 min-w-0 text-right">
+                <span className="text-rose-400 font-bold truncate">AI: {currentOpponent.name}</span>
+                <FighterAvatar fighterId={currentOpponent.id} size={30} showBorder={false} />
+              </div>
+            </div>
 
-          {/* Ready to Fight Button */}
-          <button
-            onClick={() => {
-              fighterAudio.playUltimate();
-              setScreen('versus');
-            }}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white font-black text-base tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 hover:scale-[1.01] active:scale-[0.98]"
-          >
-            <Swords className="w-5 h-5" />
-            <span>ENTER THE ARENA</span>
-          </button>
-        </div>
-      )}
+            {/* Ready to Fight Button */}
+            <button
+              onClick={() => {
+                if (!availableOpponents.some(f => f.id === selectedOpponentId)) {
+                  setSelectedOpponentId(availableOpponents[0].id);
+                }
+                fighterAudio.playUltimate();
+                setScreen('versus');
+              }}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white font-black text-base tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 hover:scale-[1.01] active:scale-[0.98]"
+            >
+              <Swords className="w-5 h-5" />
+              <span>ENTER THE ARENA</span>
+            </button>
+          </div>
+        );
+      })()}
 
       {/* ------------------------------------------------------------- */}
       {/* SCREEN 4: DRAMATIC VERSUS INTRODUCTION */}
@@ -593,12 +604,7 @@ export const DesiMemeFightersGame: React.FC = () => {
                 <h3 className="text-xl font-black text-white">{playerFighter.name}</h3>
                 <p className="text-xs text-amber-200/80 italic">"{playerFighter.memeQuotes[0]}"</p>
               </div>
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-lg"
-                style={{ backgroundColor: playerFighter.avatarColor }}
-              >
-                {playerFighter.name[0]}
-              </div>
+              <FighterAvatar fighterId={playerFighter.id} size={64} />
             </div>
 
             {/* VS Badge with Countdown */}
@@ -610,12 +616,7 @@ export const DesiMemeFightersGame: React.FC = () => {
 
             {/* Opponent Banner */}
             <div className="p-4 rounded-2xl border-2 border-rose-500 bg-rose-500/10 flex items-center justify-between">
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-lg"
-                style={{ backgroundColor: oppFighter.avatarColor }}
-              >
-                {oppFighter.name[0]}
-              </div>
+              <FighterAvatar fighterId={oppFighter.id} size={64} />
               <div className="text-right">
                 <span className="text-[10px] font-bold text-rose-400 block uppercase tracking-wider">AI OPPONENT</span>
                 <h3 className="text-xl font-black text-white">{oppFighter.name}</h3>
@@ -644,7 +645,10 @@ export const DesiMemeFightersGame: React.FC = () => {
               {/* Player 1 Health & Energy (Cols 1-5) */}
               <div className="col-span-5 space-y-1">
                 <div className="flex items-center justify-between text-[11px] font-black text-white">
-                  <span className="truncate max-w-[100px]">{playerFighter.name}</span>
+                  <div className="flex items-center gap-1.5 truncate max-w-[120px]">
+                    <FighterAvatar fighterId={playerFighter.id} size={22} showBorder={false} />
+                    <span className="truncate">{playerFighter.name}</span>
+                  </div>
                   <div className="flex gap-1">
                     {[1, 2].map(r => (
                       <div
@@ -709,7 +713,10 @@ export const DesiMemeFightersGame: React.FC = () => {
                       />
                     ))}
                   </div>
-                  <span className="truncate max-w-[100px]">{oppFighter.name}</span>
+                  <div className="flex items-center gap-1.5 truncate max-w-[120px] justify-end">
+                    <span className="truncate">{oppFighter.name}</span>
+                    <FighterAvatar fighterId={oppFighter.id} size={22} showBorder={false} />
+                  </div>
                 </div>
 
                 {/* Opponent Health Bar */}
@@ -877,10 +884,13 @@ export const DesiMemeFightersGame: React.FC = () => {
       {/* ------------------------------------------------------------- */}
       {screen === 'match-result' && matchStats && (
         <div className="absolute inset-0 z-30 flex flex-col justify-between p-6 bg-gradient-to-b from-[#180B2E] via-[#24103E] to-[#0E061B] text-white">
-          <div className="text-center space-y-1">
+          <div className="text-center space-y-2">
             <span className="text-[10px] font-black uppercase tracking-widest text-white/50">MATCH CONCLUDED</span>
+            <div className="flex justify-center">
+              <FighterAvatar fighterId={matchWinner === 'player' ? playerFighter.id : oppFighter.id} size={76} />
+            </div>
             <h2
-              className={`text-4xl font-black tracking-tight ${
+              className={`text-3xl font-black tracking-tight ${
                 matchWinner === 'player'
                   ? 'text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500'
                   : 'text-red-500'
@@ -1036,14 +1046,17 @@ export const DesiMemeFightersGame: React.FC = () => {
 
           <div className="space-y-2.5 my-auto text-xs overflow-y-auto max-h-[500px] pr-1">
             {FIGHTER_LIST.map(f => (
-              <div key={f.id} className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-black text-amber-300 text-xs">{f.name}</span>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/70">{f.title}</span>
-                </div>
-                <p className="text-[10px] text-white/70">{f.concept}</p>
-                <div className="pt-1 text-[9px] text-emerald-300">
-                  <strong>Special:</strong> {f.specialMove.name} • <strong>Ultimate:</strong> {f.ultimateMove.name}
+              <div key={f.id} className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3">
+                <FighterAvatar fighterId={f.id} size={44} />
+                <div className="flex-1 min-w-0 space-y-0.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-amber-300 text-xs">{f.name}</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/70">{f.title}</span>
+                  </div>
+                  <p className="text-[10px] text-white/70 line-clamp-2">{f.concept}</p>
+                  <div className="pt-0.5 text-[9px] text-emerald-300 truncate">
+                    <strong>Special:</strong> {f.specialMove.name} • <strong>Ult:</strong> {f.ultimateMove.name}
+                  </div>
                 </div>
               </div>
             ))}

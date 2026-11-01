@@ -33,6 +33,7 @@ export class DesiFightersScene extends Phaser.Scene {
   public playerUltEnergy = 0;
   public isPlayerBlocking = false;
   private isPlayerAttacking = false;
+  private playerAttackTimer = 0;
   private playerAttackCooldown = 0;
   private playerHitStun = 0;
 
@@ -42,6 +43,7 @@ export class DesiFightersScene extends Phaser.Scene {
   public oppUltEnergy = 0;
   public isOppBlocking = false;
   private isOppAttacking = false;
+  private oppAttackTimer = 0;
   private oppAttackCooldown = 0;
   private oppHitStun = 0;
 
@@ -167,9 +169,16 @@ export class DesiFightersScene extends Phaser.Scene {
   // ROUND MANAGEMENT
   // -------------------------------------------------------------
   public startRound(roundNum: number) {
+    this.physics.resume();
     this.currentRound = roundNum;
     this.isRoundActive = false;
     this.roundTimeRemaining = 60;
+    this.isPlayerAttacking = false;
+    this.isOppAttacking = false;
+    this.playerAttackTimer = 0;
+    this.oppAttackTimer = 0;
+    this.playerHitStun = 0;
+    this.oppHitStun = 0;
 
     // Reset health and positions
     this.playerHp = this.playerMaxHp;
@@ -299,6 +308,27 @@ export class DesiFightersScene extends Phaser.Scene {
     if (this.oppHitStun > 0) this.oppHitStun -= delta;
     if (this.playerAttackCooldown > 0) this.playerAttackCooldown -= delta;
     if (this.oppAttackCooldown > 0) this.oppAttackCooldown -= delta;
+
+    // Attack Watchdogs (failsafe against any freeze/lock)
+    if (this.isPlayerAttacking) {
+      this.playerAttackTimer += delta;
+      if (this.playerAttackTimer > 380) {
+        this.isPlayerAttacking = false;
+        this.playerAttackTimer = 0;
+      }
+    } else {
+      this.playerAttackTimer = 0;
+    }
+
+    if (this.isOppAttacking) {
+      this.oppAttackTimer += delta;
+      if (this.oppAttackTimer > 380) {
+        this.isOppAttacking = false;
+        this.oppAttackTimer = 0;
+      }
+    } else {
+      this.oppAttackTimer = 0;
+    }
 
     // 1. Automatic Face Direction (Face opponent)
     if (!this.isPlayerAttacking && this.playerHitStun <= 0) {
@@ -590,24 +620,18 @@ export class DesiFightersScene extends Phaser.Scene {
     const defDef = isPlayer ? this.oppDef : this.playerDef;
     const isDefBlocking = isPlayer ? this.isOppBlocking : this.isPlayerBlocking;
 
-    // Check Distance & Alignment
+    // Check Distance & Alignment (Seamless hit detection including corners & point-blank)
     const distance = Math.abs(atkSprite.x - defSprite.x);
-    const isFacingCorrect = isPlayer ? atkSprite.x <= defSprite.x + 20 : atkSprite.x >= defSprite.x - 20;
+    const isPointBlank = distance < 65;
+    const isFacingTarget = atkSprite.flipX ? defSprite.x <= atkSprite.x + 15 : defSprite.x >= atkSprite.x - 15;
 
-    if (distance <= reach && isFacingCorrect) {
+    if ((isPointBlank || isFacingTarget) && distance <= reach) {
       // Calculate Damage
       const atkPower = atkDef.stats.attack / 75;
       const defResist = isDefBlocking ? 0.22 * (1 - defDef.stats.defence / 250) : 1;
       let finalDamage = Math.round(baseDmg * atkPower * defResist);
 
-      // Hit-stop (brief freeze frame for arcade punch weight)
-      const hitStopDuration = attackType === 'punch' ? 50 : attackType === 'kick' ? 80 : 120;
-      this.physics.pause();
-      this.time.delayedCall(hitStopDuration, () => {
-        this.physics.resume();
-      });
-
-      // Camera Shake
+      // Camera Shake for impact
       if (attackType === 'special' || attackType === 'ultimate') {
         this.cameras.main.shake(180, 0.012);
       } else if (attackType === 'kick') {
@@ -622,6 +646,8 @@ export class DesiFightersScene extends Phaser.Scene {
         this.oppHp = Math.max(0, this.oppHp - finalDamage);
         this.totalDamageDealt += finalDamage;
         this.oppHitStun = isDefBlocking ? 120 : 320;
+        this.isOppAttacking = false; // Cancel any opponent attack locks immediately
+        this.oppAttackTimer = 0;
         this.oppSprite.setVelocityX(atkSprite.x < defSprite.x ? 180 : -180);
         this.oppSprite.setTexture(`fighter_${this.oppDef.id}_hit`);
 
@@ -632,6 +658,8 @@ export class DesiFightersScene extends Phaser.Scene {
         this.playerHp = Math.max(0, this.playerHp - finalDamage);
         this.totalDamageTaken += finalDamage;
         this.playerHitStun = isDefBlocking ? 120 : 320;
+        this.isPlayerAttacking = false; // Cancel any player attack locks immediately
+        this.playerAttackTimer = 0;
         this.playerSprite.setVelocityX(atkSprite.x < defSprite.x ? 180 : -180);
         this.playerSprite.setTexture(`fighter_${this.playerDef.id}_hit`);
 
@@ -685,6 +713,8 @@ export class DesiFightersScene extends Phaser.Scene {
       this.oppHp = Math.max(0, this.oppHp - finalDmg);
       this.totalDamageDealt += finalDmg;
       this.oppHitStun = 350;
+      this.isOppAttacking = false;
+      this.oppAttackTimer = 0;
       this.oppSprite.setVelocityX(hitX < this.oppSprite.x ? 220 : -220);
       this.oppSprite.setTexture(`fighter_${this.oppDef.id}_hit`);
       this.spawnDamageNumber(hitX, hitY, finalDmg, true);
@@ -694,6 +724,8 @@ export class DesiFightersScene extends Phaser.Scene {
       this.playerHp = Math.max(0, this.playerHp - finalDmg);
       this.totalDamageTaken += finalDmg;
       this.playerHitStun = 350;
+      this.isPlayerAttacking = false;
+      this.playerAttackTimer = 0;
       this.playerSprite.setVelocityX(hitX < this.playerSprite.x ? 220 : -220);
       this.playerSprite.setTexture(`fighter_${this.playerDef.id}_hit`);
       this.spawnDamageNumber(hitX, hitY, finalDmg, true);
