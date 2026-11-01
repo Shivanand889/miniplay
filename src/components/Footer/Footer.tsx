@@ -66,6 +66,11 @@ export const Footer: React.FC = () => {
                   Fruit Slash (Juicy Combos)
                 </Link>
               </li>
+              <li>
+                <Link to="/games/desi-meme-fighters" className="hover:text-primary-light transition-colors">
+                  Desi Meme Fighters (Street Brawler)
+                </Link>
+              </li>
             </ul>
           </div>
 

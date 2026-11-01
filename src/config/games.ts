@@ -298,6 +298,71 @@ export const GAMES: GameDefinition[] = [
       { id: 'golden_muramasa', name: 'Golden Muramasa', cost: 500, unlocked: false, color: '#FBBF24', secondaryColor: '#B45309', description: 'Legendary gilded blade that radiates sparkling stardust.' },
     ],
   },
+  {
+    id: 'desi-meme-fighters',
+    slug: 'desi-meme-fighters',
+    name: 'Desi Meme Fighters',
+    tagline: 'Four legends. One arena. Unlimited drama.',
+    description: 'Desi Meme Fighters is an action-packed 2D arcade fighting game featuring four hilarious Indian meme-inspired brawlers: Jaldi The Late, Pookie Don, Mega Mart Guard, and Vadapav Warrior. Battle intelligent local AI opponents across best-of-3 rounds, execute comic punches and kicks, and trigger meme-themed special attacks and ultimate moves with full comic DHISHOOM effects. 100% free with zero downloads or installs.',
+    category: 'Action',
+    tags: ['Mini Games', 'Fighting Games', 'Meme Games', 'Action Games', 'Arcade Games', 'Free Online Games', 'Browser Games', 'No Download Games', 'Funny Games', 'Casual Games'],
+    thumbnail: '/images/games/desi-meme-fighters.svg',
+    featured: true,
+    popular: true,
+    rating: 4.96,
+    playsCount: 22400,
+    releaseDate: '2025-02-01',
+    controls: {
+      desktop: [
+        'A / D: Move Left / Move Right',
+        'W: Jump into the air',
+        'J: Quick Punch (builds Special and Ultimate meter)',
+        'K: Heavy Kick (powerful reach and knockback)',
+        'L (Hold): Defensive Block (reduces incoming damage by 80%)',
+        'U: Special Move (Late Entry / Pookie Shuffle / Entry Denied / Chutney Blast)',
+        'I: Ultimate Move (Full meter cinematic combo finisher)',
+      ],
+      mobile: [
+        'On-screen D-Pad: Left, Right, and Jump buttons',
+        'Action Buttons: Dedicated touch targets for Punch, Kick, Block, Special, and Ultimate',
+        'Full simultaneous keyboard and touch control support with no page scroll interference',
+      ],
+    },
+    rules: [
+      'Matches are structured as Best of 3 rounds; the first fighter to secure two round victories wins the match.',
+      'Each round lasts 60 seconds. Reduce your opponent’s health bar to zero to score a K.O. victory.',
+      'Landing normal punches and kicks builds Special Energy and charges your Ultimate meter.',
+      'Holding Block cushions enemy attacks and prevents hit-stun knockback.',
+      'Special moves consume energy and have unique crowd-control properties (projectiles, dashes, alert barriers).',
+      'Fill your Ultimate meter to 100% to unleash a cinematic super finisher with massive damage.',
+    ],
+    tips: [
+      'Mix up fast punches with reach kicks to prevent the AI opponent from predicting your attacks.',
+      'Use Defensive Block (L) when the AI approaches to absorb their hits, then counter-attack immediately.',
+      'Save your Ultimate move (I) for when the opponent is pinned against the arena edge for guaranteed impact.',
+      'Each character has different stats: Mega Mart Guard has high defense, Jaldi has unmatched speed, and Vadapav Warrior deals devastating damage.',
+    ],
+    faqs: [
+      {
+        question: 'How do you play Desi Meme Fighters online for free with no download?',
+        answer: 'You can play Desi Meme Fighters instantly on MiniPlay across Chrome, Safari, Edge, or Firefox. Select your preferred desi meme legend, pick an AI opponent or choose Random, and jump straight into the street arena without any app store downloads or registrations.'
+      },
+      {
+        question: 'Who are the four characters in Desi Meme Fighters?',
+        answer: 'The game features four unique Indian meme legends: Jaldi The Late (super-speedster with a ticking watch), Pookie Don (gangster with oversized shades and cute dance steps), Mega Mart Guard (disciplined store guard with a loud whistle and entry barriers), and Vadapav Warrior (street-food master who hurls spicy chutney bombs and fiery vada pavs).'
+      },
+      {
+        question: 'Does the game support touch controls on mobile phones?',
+        answer: 'Yes! Desi Meme Fighters features responsive touch buttons for Left, Right, Jump, Punch, Kick, Block, Special, and Ultimate moves, optimized for smooth 60 FPS gameplay on iOS and Android browsers.'
+      }
+    ],
+    skins: [
+      { id: 'classic_jaldi', name: 'Original Streetwear', cost: 0, unlocked: true, color: '#EA580C', secondaryColor: '#FBBF24', description: 'Standard high-visibility orange track jacket.' },
+      { id: 'royal_pookie', name: 'Royal Pookie Purple', cost: 100, unlocked: false, color: '#7E22CE', secondaryColor: '#EC4899', description: 'Tailored luxury blazer with 24k gold chain.' },
+      { id: 'khaki_guard', name: 'Khaki Security Elite', cost: 300, unlocked: false, color: '#1E3A8A', secondaryColor: '#38BDF8', description: 'Regulation tactical uniform with gold officer badge.' },
+      { id: 'mumbai_vadapav', name: 'Mumbai Master Chef', cost: 500, unlocked: false, color: '#DC2626', secondaryColor: '#F59E0B', description: 'Battle-hardened vendor apron with flaming spatula.' },
+    ],
+  },
 ];
 
 export const CATEGORIES: { name: GameDefinition['category']; icon: string; count: number; description: string }[] = [
@@ -306,6 +371,6 @@ export const CATEGORIES: { name: GameDefinition['category']; icon: string; count
   { name: 'Endless Runner', icon: 'Footprints', count: 1, description: 'Sprint across continuous hurdles, slide under beams, and dodge traps.' },
   { name: 'Shooting', icon: 'Crosshair', count: 1, description: 'Top-down galactic dogfights, laser upgrades, and dreadnought boss fights.' },
   { name: 'Reflex', icon: 'Zap', count: 1, description: 'Blade slicing, rapid hand-eye coordination, and combo chains.' },
-  { name: 'Action', icon: 'Flame', count: 2, description: 'Fast-paced combat, intense evasive maneuvers, and high stakes.' },
+  { name: 'Action', icon: 'Flame', count: 3, description: 'Fast-paced combat, intense evasive maneuvers, and high stakes.' },
   { name: 'Casual', icon: 'Smile', count: 2, description: 'Pick up and play in seconds, no stress, pure addictive joy.' },
 ];

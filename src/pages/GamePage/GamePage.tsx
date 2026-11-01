@@ -40,6 +40,9 @@ const SpaceShooterGame = lazy(() =>
 const FruitSlashGame = lazy(() =>
   import('../../games/fruit-slash/FruitSlashGame').then(m => ({ default: m.FruitSlashGame }))
 );
+const DesiMemeFightersGame = lazy(() =>
+  import('../../games/desi-meme-fighters/DesiMemeFightersGame').then(m => ({ default: m.DesiMemeFightersGame }))
+);
 
 export const GamePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -136,16 +139,26 @@ export const GamePage: React.FC = () => {
         return <SpaceShooterGame />;
       case 'fruit-slash':
         return <FruitSlashGame />;
+      case 'desi-meme-fighters':
+        return <DesiMemeFightersGame />;
       default:
         return null;
     }
   };
 
+  const pageTitle = game.id === 'desi-meme-fighters'
+    ? 'Desi Meme Fighters – Funny Indian Arcade Fighting Game | MiniPlay'
+    : `Play ${game.name} Online - Free Arcade Mini Game`;
+
+  const pageDescription = game.id === 'desi-meme-fighters'
+    ? 'Choose your favourite desi meme fighter, battle hilarious AI opponents and unleash unique special attacks in this free online arcade fighting game. Play instantly on MiniPlay.'
+    : game.description;
+
   return (
     <article className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 space-y-10">
       <SEOHead
-        title={`Play ${game.name} Online - Free Arcade Mini Game`}
-        description={game.description}
+        title={pageTitle}
+        description={pageDescription}
         keywords={`${game.name}, play ${game.name} online, free mini games, free online games, browser games, no download games, arcade games, ${game.tags.join(', ')}`}
         canonicalUrl={`https://www.playhere.space/games/${game.slug}`}
         ogType="game"

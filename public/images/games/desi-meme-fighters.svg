@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#180B2E" />
+      <stop offset="50%" stop-color="#2D124D" />
+      <stop offset="100%" stop-color="#0F051D" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="50%" stop-color="#EAB308" />
+      <stop offset="100%" stop-color="#CA8A04" />
+    </linearGradient>
+    <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#DC2626" />
+      <stop offset="50%" stop-color="#EA580C" />
+      <stop offset="100%" stop-color="#FBBF24" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="480" height="320" fill="url(#bgGrad)" />
+
+  <!-- Speed Burst Lines / Comic Background Rays -->
+  <g opacity="0.18">
+    <path d="M240 160 L0 0 L40 0 Z" fill="#FBBF24" />
+    <path d="M240 160 L120 0 L160 0 Z" fill="#FBBF24" />
+    <path d="M240 160 L240 0 L280 0 Z" fill="#FBBF24" />
+    <path d="M240 160 L360 0 L400 0 Z" fill="#FBBF24" />
+    <path d="M240 160 L480 0 L480 40 Z" fill="#FBBF24" />
+    <path d="M240 160 L480 120 L480 160 Z" fill="#FBBF24" />
+    <path d="M240 160 L480 240 L480 280 Z" fill="#FBBF24" />
+    <path d="M240 160 L480 320 L440 320 Z" fill="#FBBF24" />
+    <path d="M240 160 L320 320 L280 320 Z" fill="#FBBF24" />
+    <path d="M240 160 L160 320 L120 320 Z" fill="#FBBF24" />
+    <path d="M240 160 L0 320 L0 280 Z" fill="#FBBF24" />
+    <path d="M240 160 L0 200 L0 160 Z" fill="#FBBF24" />
+    <path d="M240 160 L0 80 L0 40 Z" fill="#FBBF24" />
+  </g>
+
+  <!-- Arena Ground Floor -->
+  <rect y="270" width="480" height="50" fill="#1E1B4B" />
+  <rect y="266" width="480" height="4" fill="#F59E0B" />
+  <line x1="0" y1="285" x2="480" y2="285" stroke="#312E81" stroke-dasharray="10 10" stroke-width="2" />
+
+  <!-- Street Shop Signs in Background (Silhouette/Atmosphere) -->
+  <g opacity="0.6">
+    <!-- Vada Pav Stall -->
+    <rect x="25" y="195" width="85" height="72" rx="4" fill="#3B1C54" stroke="#6D28D9" stroke-width="2" />
+    <rect x="20" y="190" width="95" height="14" rx="3" fill="#D97706" />
+    <text x="67" y="200" fill="#FEF08A" font-family="sans-serif" font-weight="900" font-size="8" text-anchor="middle">VADA PAV</text>
+    
+    <!-- Super Mart -->
+    <rect x="370" y="185" width="85" height="82" rx="4" fill="#1E293B" stroke="#0284C7" stroke-width="2" />
+    <rect x="365" y="180" width="95" height="14" rx="3" fill="#0284C7" />
+    <text x="412" y="190" fill="#FFFFFF" font-family="sans-serif" font-weight="900" font-size="8" text-anchor="middle">SUPER MART</text>
+  </g>
+
+  <!-- Big Central Impact Comic Starburst -->
+  <path d="M240 60 L260 110 L315 85 L285 135 L340 145 L290 175 L330 220 L270 210 L275 265 L240 225 L205 265 L210 210 L150 220 L190 175 L140 145 L195 135 L165 85 L220 110 Z"
+        fill="url(#fireGrad)" stroke="#FEF08A" stroke-width="4" filter="url(#glow)" />
+
+  <!-- Comic "DHISHOOM!" text badge -->
+  <g transform="translate(240, 160) rotate(-6)">
+    <rect x="-85" y="-22" width="170" height="44" rx="10" fill="#000000" opacity="0.75" />
+    <text x="0" y="8" fill="#FACC15" font-family="Impact, Arial Black, sans-serif" font-weight="900" font-size="32" text-anchor="middle" letter-spacing="2" stroke="#DC2626" stroke-width="2">
+      DHISHOOM!
+    </text>
+  </g>
+
+  <!-- Fighter Left: Jaldi / Vadapav Fist Clash -->
+  <g transform="translate(90, 150)">
+    <!-- Glove / Punch Effect Left -->
+    <circle cx="20" cy="0" r="32" fill="#EA580C" stroke="#FDE047" stroke-width="3" />
+    <path d="M-10 -15 L25 -5 L-10 15 Z" fill="#DC2626" />
+    <circle cx="35" cy="-8" r="8" fill="#FDE047" />
+    <circle cx="35" cy="8" r="8" fill="#FDE047" />
+  </g>
+
+  <!-- Fighter Right: Guard / Pookie Fist Clash -->
+  <g transform="translate(390, 150) scale(-1, 1)">
+    <!-- Glove / Punch Effect Right -->
+    <circle cx="20" cy="0" r="32" fill="#8B5CF6" stroke="#C084FC" stroke-width="3" />
+    <path d="M-10 -15 L25 -5 L-10 15 Z" fill="#6D28D9" />
+    <circle cx="35" cy="-8" r="8" fill="#E9D5FF" />
+    <circle cx="35" cy="8" r="8" fill="#E9D5FF" />
+  </g>
+
+  <!-- Comic Text Sparks -->
+  <circle cx="210" cy="90" r="6" fill="#FDE047" />
+  <circle cx="280" cy="85" r="8" fill="#FFFFFF" />
+  <circle cx="250" cy="240" r="5" fill="#F97316" />
+
+  <!-- Top Title Banner -->
+  <g transform="translate(240, 48)">
+    <!-- Drop Shadow -->
+    <text x="2" y="2" fill="#000000" font-family="Impact, Arial Black, sans-serif" font-weight="900" font-size="36" text-anchor="middle" letter-spacing="2">
+      DESI MEME FIGHTERS
+    </text>
+    <!-- Main Title -->
+    <text x="0" y="0" fill="url(#goldGrad)" font-family="Impact, Arial Black, sans-serif" font-weight="900" font-size="36" text-anchor="middle" letter-spacing="2" stroke="#78350F" stroke-width="1.5">
+      DESI MEME FIGHTERS
+    </text>
+  </g>
+
+  <!-- Subtitle Tagline -->
+  <g transform="translate(240, 295)">
+    <rect x="-140" y="-12" width="280" height="22" rx="11" fill="#1E1B4B" stroke="#6366F1" stroke-width="1.5" />
+    <text x="0" y="3" fill="#E0E7FF" font-family="sans-serif" font-weight="800" font-size="11" text-anchor="middle" letter-spacing="1">
+      4 LEGENDS • 1 ARENA • UNLIMITED DRAMA
+    </text>
+  </g>
+</svg>
