@@ -67,6 +67,8 @@ export class DesiFightersScene extends Phaser.Scene {
   public playerUltsUsed = 0;
 
   // Keyboard Keys
+  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private keySpace!: Phaser.Input.Keyboard.Key;
   private keyA!: Phaser.Input.Keyboard.Key;
   private keyD!: Phaser.Input.Keyboard.Key;
   private keyW!: Phaser.Input.Keyboard.Key;
@@ -143,8 +145,10 @@ export class DesiFightersScene extends Phaser.Scene {
       this.handleProjectileHit(obj1 as Phaser.Physics.Arcade.Sprite, 'player');
     });
 
-    // 5. Setup Keyboard Controls
+    // 5. Setup Keyboard Controls (A/D/W, Arrow Keys, Spacebar, J/K/L/U/I)
     if (this.input.keyboard) {
+      this.cursors = this.input.keyboard.createCursorKeys();
+      this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
       this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
       this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
       this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
@@ -154,11 +158,14 @@ export class DesiFightersScene extends Phaser.Scene {
       this.keyU = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.U);
       this.keyI = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
 
-      // Key Down Events for Attacks
+      // Key Down Events for Attacks & Jump
       this.keyJ.on('down', () => this.handlePlayerPunch());
       this.keyK.on('down', () => this.handlePlayerKick());
       this.keyU.on('down', () => this.handlePlayerSpecial());
       this.keyI.on('down', () => this.handlePlayerUltimate());
+      this.keyW.on('down', () => this.triggerPlayerJump());
+      this.cursors.up.on('down', () => this.triggerPlayerJump());
+      this.keySpace.on('down', () => this.triggerPlayerJump());
     }
 
     // 6. Start Round 1
@@ -364,9 +371,9 @@ export class DesiFightersScene extends Phaser.Scene {
       return;
     }
 
-    // Horizontal Movement
-    const keyLeft = this.keyA ? this.keyA.isDown : false;
-    const keyRight = this.keyD ? this.keyD.isDown : false;
+    // Horizontal Movement (A/D or Arrow Left/Right or Touch)
+    const keyLeft = (this.keyA && this.keyA.isDown) || (this.cursors && this.cursors.left.isDown);
+    const keyRight = (this.keyD && this.keyD.isDown) || (this.cursors && this.cursors.right.isDown);
 
     if (keyLeft || this.touchMoveDir === -1) {
       moveX = -baseSpeed;
@@ -376,8 +383,8 @@ export class DesiFightersScene extends Phaser.Scene {
 
     this.playerSprite.setVelocityX(moveX);
 
-    // Jump (W or touch)
-    const keyJump = this.keyW ? this.keyW.isDown : false;
+    // Jump (W or Arrow Up or Space or touch)
+    const keyJump = (this.keyW && this.keyW.isDown) || (this.cursors && this.cursors.up.isDown) || (this.keySpace && this.keySpace.isDown);
     const isGrounded = this.playerSprite.body?.touching.down;
     if (keyJump && isGrounded) {
       this.triggerPlayerJump();

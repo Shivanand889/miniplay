@@ -246,6 +246,55 @@ export const DesiMemeFightersGame: React.FC = () => {
     };
   }, [screen, selectedPlayerId, selectedOpponentId, difficulty]);
 
+  // Global Keyboard listener for smooth PC gameplay (WASD + Arrow Keys + Space)
+  useEffect(() => {
+    if (screen !== 'fighting') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+        e.preventDefault();
+      }
+
+      const key = e.key.toLowerCase();
+      if (key === 'a' || e.key === 'ArrowLeft') {
+        sceneRef.current?.setMobileMove(-1);
+      } else if (key === 'd' || e.key === 'ArrowRight') {
+        sceneRef.current?.setMobileMove(1);
+      } else if (key === 'w' || e.key === 'ArrowUp' || e.key === ' ') {
+        sceneRef.current?.triggerPlayerJump();
+      } else if (key === 'j') {
+        sceneRef.current?.handlePlayerPunch();
+      } else if (key === 'k') {
+        sceneRef.current?.handlePlayerKick();
+      } else if (key === 'l') {
+        sceneRef.current?.setMobileBlock(true);
+      } else if (key === 'u') {
+        sceneRef.current?.handlePlayerSpecial();
+      } else if (key === 'i') {
+        sceneRef.current?.handlePlayerUltimate();
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      if (key === 'a' || e.key === 'ArrowLeft') {
+        sceneRef.current?.setMobileMove(0);
+      } else if (key === 'd' || e.key === 'ArrowRight') {
+        sceneRef.current?.setMobileMove(0);
+      } else if (key === 'l') {
+        sceneRef.current?.setMobileBlock(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [screen]);
+
   // Touch action triggers
   const handleTouchPunch = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -995,8 +1044,8 @@ export const DesiMemeFightersGame: React.FC = () => {
             <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
               <span className="font-bold text-amber-300 block">Desktop Keyboard Controls</span>
               <ul className="space-y-1 text-white/80 text-[11px]">
-                <li>• <strong>A / D:</strong> Move Left / Right</li>
-                <li>• <strong>W:</strong> Jump into the air</li>
+                <li>• <strong>A / D or ◀ / ▶:</strong> Move Left / Right</li>
+                <li>• <strong>W or ▲ or Space:</strong> Jump into the air</li>
                 <li>• <strong>J:</strong> Quick Punch (generates energy)</li>
                 <li>• <strong>K:</strong> Heavy Kick (high reach &amp; knockback)</li>
                 <li>• <strong>L (Hold):</strong> Block incoming attacks (-80% damage)</li>
