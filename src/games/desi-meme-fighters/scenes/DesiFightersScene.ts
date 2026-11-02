@@ -145,18 +145,21 @@ export class DesiFightersScene extends Phaser.Scene {
     this.physics.add.collider(this.oppSprite, this.ground);
 
     // ---------------------------------------------------------------
-    // FIX: Projectile overlaps — guard with isRoundActive + hitProjectileIds
+    // FIX: Projectile overlaps — correctly identify which object is the projectile!
+    // In Phaser Arcade physics, overlap passes (childA, childB) where one is the group
+    // child (the projectile) and the other is the sprite. We explicitly detect which is
+    // the projectile and guarantee neither playerSprite nor oppSprite can ever be destroyed.
     // ---------------------------------------------------------------
-    this.physics.add.overlap(this.projectiles, this.oppSprite, (obj1) => {
+    this.physics.add.overlap(this.projectiles, this.oppSprite, (item1, item2) => {
       if (!this.isRoundActive) return;
-      const proj = obj1 as Phaser.Physics.Arcade.Sprite;
-      if (!proj.active || this.hitProjectiles.has(proj)) return;
+      const proj = (item1 === this.oppSprite ? item2 : item1) as Phaser.Physics.Arcade.Sprite;
+      if (!proj || proj === this.oppSprite || proj === this.playerSprite || !proj.active || this.hitProjectiles.has(proj)) return;
       this.handleProjectileHit(proj, 'opponent');
     });
-    this.physics.add.overlap(this.projectiles, this.playerSprite, (obj1) => {
+    this.physics.add.overlap(this.projectiles, this.playerSprite, (item1, item2) => {
       if (!this.isRoundActive) return;
-      const proj = obj1 as Phaser.Physics.Arcade.Sprite;
-      if (!proj.active || this.hitProjectiles.has(proj)) return;
+      const proj = (item1 === this.playerSprite ? item2 : item1) as Phaser.Physics.Arcade.Sprite;
+      if (!proj || proj === this.playerSprite || proj === this.oppSprite || !proj.active || this.hitProjectiles.has(proj)) return;
       this.handleProjectileHit(proj, 'player');
     });
 
@@ -943,13 +946,14 @@ export class DesiFightersScene extends Phaser.Scene {
 
   // ---------------------------------------------------------------
   // FIX: Projectile hit — mark as hit immediately to block re-entry,
-  // then safely read position before destroy(), guard all sprite calls
+  // then safely read position before destroy(), guard all sprite calls.
+  // STRICT GUARD: Fighter sprites are NEVER destroyed by projectile hit!
   // ---------------------------------------------------------------
   private handleProjectileHit(proj: Phaser.Physics.Arcade.Sprite, defender: 'player' | 'opponent') {
-    if (!proj.active) return;
+    if (!proj || !proj.active || proj === this.playerSprite || proj === this.oppSprite) return;
 
     const owner = proj.getData('owner');
-    if (owner === defender) return; // Don't hit self
+    if (!owner || owner === defender) return; // Don't hit self or unowned objects
 
     // Mark as consumed immediately to prevent double-hit
     this.hitProjectiles.add(proj);
