@@ -58,22 +58,36 @@ export const GamePage: React.FC = () => {
   const userProgress = StorageService.getGameProgress(game.id);
   const relatedGames = GAMES.filter(g => g.id !== game.id).slice(0, 3);
 
-  // Multi-schema Structured Data (JSON-LD) for VideoGame, Breadcrumbs & FAQPage
+  // Multi-schema Structured Data (JSON-LD) for VideoGame & BreadcrumbList
+  // NOTE: FAQPage schema is intentionally omitted — Google retired FAQPage rich results (May 2026).
+  // The visible FAQ accordion below still serves users and AI citability.
   const structuredData = [
     {
       '@type': 'VideoGame',
       '@id': `https://www.playhere.space/games/${game.slug}#game`,
       name: game.name,
       description: game.description,
+      url: `https://www.playhere.space/games/${game.slug}`,
+      image: `https://www.playhere.space${game.thumbnail}`,
       genre: [game.category, ...game.tags],
       playMode: 'SinglePlayer',
+      numberOfPlayers: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 1 },
       applicationCategory: 'BrowserGame',
-      gamePlatform: ['Web Browser', 'Mobile Browser', 'Desktop'],
+      gamePlatform: ['Web Browser', 'Mobile Browser', 'Desktop Browser'],
       operatingSystem: 'Any modern browser (Chrome, Safari, Firefox, Edge)',
+      inLanguage: 'en-US',
+      datePublished: game.releaseDate,
+      dateModified: '2026-11-02',
+      publisher: {
+        '@type': 'Organization',
+        '@id': 'https://www.playhere.space/#organization',
+        name: 'MiniPlay Arcade',
+      },
       offers: {
         '@type': 'Offer',
         price: '0',
         priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
       },
       aggregateRating: {
         '@type': 'AggregateRating',
@@ -113,18 +127,6 @@ export const GamePage: React.FC = () => {
         },
       ],
     },
-    {
-      '@type': 'FAQPage',
-      '@id': `https://www.playhere.space/games/${game.slug}#faq`,
-      mainEntity: game.faqs.map(faq => ({
-        '@type': 'Question',
-        name: faq.question,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: faq.answer,
-        },
-      })),
-    },
   ];
 
   const renderGameComponent = () => {
@@ -147,12 +149,12 @@ export const GamePage: React.FC = () => {
   };
 
   const pageTitle = game.id === 'desi-meme-fighters'
-    ? 'Desi Meme Fighters – Funny Indian Arcade Fighting Game | MiniPlay'
-    : `Play ${game.name} Online - Free Arcade Mini Game`;
+    ? 'Desi Meme Fighters – Free Indian Meme Fighting Game Online | MiniPlay'
+    : `Play ${game.name} Free Online — No Download | MiniPlay`;
 
   const pageDescription = game.id === 'desi-meme-fighters'
-    ? 'Choose your favourite desi meme fighter, battle hilarious AI opponents and unleash unique special attacks in this free online arcade fighting game. Play instantly on MiniPlay.'
-    : game.description;
+    ? 'Desi Meme Fighters is a free online 2D arcade fighting game. Play instantly as Jaldi The Late, Pookie Don, Mega Mart Guard, or Vadapav Warrior. No download needed. Available on mobile and PC.'
+    : `${game.name} is a free online arcade game — play instantly in your browser with no download or sign-up. ${game.tagline} Available on mobile and desktop.`;
 
   return (
     <article className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 space-y-10">
@@ -162,7 +164,7 @@ export const GamePage: React.FC = () => {
         keywords={`${game.name}, play ${game.name} online, free mini games, free online games, browser games, no download games, arcade games, ${game.tags.join(', ')}`}
         canonicalUrl={`https://www.playhere.space/games/${game.slug}`}
         ogType="game"
-        ogImage={game.thumbnail}
+        ogImage={`https://www.playhere.space${game.thumbnail}`}
         structuredData={structuredData}
       />
 

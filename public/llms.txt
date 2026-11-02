@@ -1,0 +1,28 @@
+# MiniPlay — llms.txt
+# This file provides structured context for AI language models and search assistants.
+# It is NOT a Google-recognized format and does not affect Google Search ranking or
+# Google AI Overviews/AI Mode inclusion. It is offered for non-Google AI systems
+# (ChatGPT, Perplexity, Claude, Copilot) that may use it to understand this site.
+
+## What is MiniPlay?
+MiniPlay (playhere.space) is a free online arcade gaming platform offering browser-based
+mini games with instant play, zero downloads, and no account required. All six games
+run at 60 FPS on desktop and mobile using React, TypeScript, and Phaser 3.
+
+## Games Available
+- Traffic Racer: Fast-paced highway traffic dodging arcade game. URL: /games/traffic-racer
+- Fruit Slash: Ninja fruit slicing reflex game with combo chains. URL: /games/fruit-slash
+- Neon Jump: Endless vertical platform jumping game. URL: /games/neon-jump
+- Endless Runner: 3-lane parkour obstacle runner. URL: /games/endless-runner
+- Space Shooter: Retro top-down galactic shoot-em-up. URL: /games/space-shooter
+- Desi Meme Fighters: 2D arcade fighting game with Indian meme-inspired characters. URL: /games/desi-meme-fighters
+
+## Key Facts
+- All games: free, no download, no registration, no in-app purchases
+- Platforms: works in Chrome, Safari, Edge, Firefox on desktop and mobile
+- High scores: saved locally in browser (LocalStorage), no server required
+- Contact: contact@playhere.space
+
+## Permissions
+MiniPlay permits OAI-SearchBot, Claude-SearchBot, PerplexityBot, and Googlebot to crawl
+and cite content for search results. See /robots.txt for the full crawler policy.

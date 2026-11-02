@@ -2,13 +2,51 @@ import React from 'react';
 import { SEOHead } from '../../components/SEO/SEOHead';
 import { Gamepad2, Zap, Heart, Trophy, Users, Shield } from 'lucide-react';
 
+const ABOUT_STRUCTURED_DATA = [
+  {
+    '@type': 'Organization',
+    '@id': 'https://www.playhere.space/#organization',
+    name: 'MiniPlay Arcade',
+    alternateName: 'MiniPlay',
+    url: 'https://www.playhere.space/',
+    description:
+      'MiniPlay is a free online browser arcade gaming platform. It provides instant-play HTML5 mini games — zero downloads, zero registrations — built on React, TypeScript, and Phaser 3.',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://www.playhere.space/logo.png',
+      width: 1024,
+      height: 1024,
+    },
+    image: 'https://www.playhere.space/og-image.png',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      email: 'contact@playhere.space',
+    },
+    sameAs: [],
+  },
+  {
+    '@type': 'WebPage',
+    '@id': 'https://www.playhere.space/about#webpage',
+    url: 'https://www.playhere.space/about',
+    name: 'About MiniPlay — Free Online Arcade Games, No Download',
+    description:
+      'Learn about MiniPlay: who built it, why it was built, the technology stack (React + Phaser 3), and our mission to deliver instant 60 FPS arcade gaming with zero downloads or sign-ups.',
+    inLanguage: 'en-US',
+    isPartOf: { '@id': 'https://www.playhere.space/#website' },
+    about: { '@id': 'https://www.playhere.space/#organization' },
+    dateModified: '2026-11-02',
+  },
+];
+
 export const AboutPage: React.FC = () => {
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       <SEOHead
-        title="About Us"
-        description="Learn about MiniPlay's mission to deliver instant, high-octane 60 FPS arcade gaming in the browser without downloads or sign-ups."
+        title="About MiniPlay — Free Online Arcade Games, No Download"
+        description="MiniPlay is a free online arcade gaming platform built on React and Phaser 3. Six instant-play browser mini games — no downloads, no accounts, no paywalls. Learn who built it and why."
         canonicalUrl="https://www.playhere.space/about"
+        structuredData={ABOUT_STRUCTURED_DATA}
       />
 
       <div className="border-b border-dark-border pb-6">
@@ -19,8 +57,9 @@ export const AboutPage: React.FC = () => {
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
           About MiniPlay
         </h1>
+        {/* Direct-answer block: self-contained for AI/GEO citability */}
         <p className="text-base text-text-muted mt-2">
-          "Play More. Beat Your Best." Free online arcade games. No downloads. Just play.
+          <strong>MiniPlay</strong> is a free online arcade gaming platform at <a href="https://www.playhere.space" className="text-secondary hover:underline">playhere.space</a>. It offers six instant-play browser mini games — Traffic Racer, Fruit Slash, Neon Jump, Endless Runner, Space Shooter, and Desi Meme Fighters — with no downloads, no account registration, and no paywalls. Games run at 60 FPS on any modern desktop or mobile browser using React, TypeScript, and Phaser 3.
         </p>
       </div>
 

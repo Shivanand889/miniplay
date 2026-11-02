@@ -25,8 +25,12 @@ import {
 
 const HOME_FAQS = [
   {
+    question: 'What is MiniPlay?',
+    answer: 'MiniPlay (playhere.space) is a free online arcade gaming platform. It offers six instant-play browser mini games — Traffic Racer, Fruit Slash, Neon Jump, Endless Runner, Space Shooter, and Desi Meme Fighters — with no downloads, no account registration, and no in-app purchases. All games run at 60 FPS on any modern desktop or mobile browser.'
+  },
+  {
     question: 'What are some free mini games to play online?',
-    answer: 'MiniPlay offers an instant-play arcade library of top free mini games to play online: Traffic Racer (high-speed highway dodging), Fruit Slash (ninja fruit slicing combos), Neon Jump (endless vertical platform bouncer), Endless Runner (fast 3-lane obstacle dodging), and Space Shooter (retro top-down galactic dogfights). Every game runs natively in modern web browsers on phone and desktop.'
+    answer: 'MiniPlay offers an instant-play arcade library of top free mini games to play online: Traffic Racer (high-speed highway dodging), Fruit Slash (ninja fruit slicing combos), Neon Jump (endless vertical platform bouncer), Endless Runner (fast 3-lane obstacle dodging), Space Shooter (retro top-down galactic dogfights), and Desi Meme Fighters (2D Indian meme fighting game). Every game runs natively in modern web browsers on phone and desktop.'
   },
   {
     question: 'What are the best free browser games with no download?',
