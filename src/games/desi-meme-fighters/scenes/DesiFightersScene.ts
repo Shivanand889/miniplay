@@ -82,6 +82,12 @@ export class DesiFightersScene extends Phaser.Scene {
   public touchMoveDir = 0;
   public touchBlocking = false;
 
+  // ---------------------------------------------------------------
+  // FIX: Track projectiles that have already hit to prevent double-fire
+  // Using object reference (no .id on Arcade.Sprite in types)
+  // ---------------------------------------------------------------
+  private hitProjectiles = new Set<Phaser.Physics.Arcade.Sprite>();
+
   constructor(
     callbacks: DesiFightersCallbacks,
     playerDef: FighterDefinition,
@@ -109,7 +115,7 @@ export class DesiFightersScene extends Phaser.Scene {
     const floorBar = this.add.rectangle(240, 440, 480, 20, 0x000000, 0);
     this.ground.add(floorBar);
 
-    // 3. Projectiles Group
+    // 3. Projectiles Group (no gravity)
     this.projectiles = this.physics.add.group({
       allowGravity: false,
     });
@@ -137,12 +143,20 @@ export class DesiFightersScene extends Phaser.Scene {
     this.physics.add.collider(this.playerSprite, this.ground);
     this.physics.add.collider(this.oppSprite, this.ground);
 
-    // Projectile overlap with fighters
-    this.physics.add.overlap(this.projectiles, this.oppSprite, (obj1, obj2) => {
-      this.handleProjectileHit(obj1 as Phaser.Physics.Arcade.Sprite, 'opponent');
+    // ---------------------------------------------------------------
+    // FIX: Projectile overlaps — guard with isRoundActive + hitProjectileIds
+    // ---------------------------------------------------------------
+    this.physics.add.overlap(this.projectiles, this.oppSprite, (obj1) => {
+      if (!this.isRoundActive) return;
+      const proj = obj1 as Phaser.Physics.Arcade.Sprite;
+      if (!proj.active || this.hitProjectiles.has(proj)) return;
+      this.handleProjectileHit(proj, 'opponent');
     });
-    this.physics.add.overlap(this.projectiles, this.playerSprite, (obj1, obj2) => {
-      this.handleProjectileHit(obj1 as Phaser.Physics.Arcade.Sprite, 'player');
+    this.physics.add.overlap(this.projectiles, this.playerSprite, (obj1) => {
+      if (!this.isRoundActive) return;
+      const proj = obj1 as Phaser.Physics.Arcade.Sprite;
+      if (!proj.active || this.hitProjectiles.has(proj)) return;
+      this.handleProjectileHit(proj, 'player');
     });
 
     // 5. Setup Keyboard Controls (A/D/W, Arrow Keys, Spacebar, J/K/L/U/I)
@@ -179,6 +193,10 @@ export class DesiFightersScene extends Phaser.Scene {
     this.physics.resume();
     this.currentRound = roundNum;
     this.isRoundActive = false;
+
+    // ---------------------------------------------------------------
+    // FIX: Full state reset on round start — clears all locks
+    // ---------------------------------------------------------------
     this.roundTimeRemaining = 60;
     this.isPlayerAttacking = false;
     this.isOppAttacking = false;
@@ -186,6 +204,17 @@ export class DesiFightersScene extends Phaser.Scene {
     this.oppAttackTimer = 0;
     this.playerHitStun = 0;
     this.oppHitStun = 0;
+    this.playerAttackCooldown = 0;
+    this.oppAttackCooldown = 0;
+    this.isPlayerBlocking = false;
+    this.isOppBlocking = false;
+    this.touchBlocking = false;
+    this.touchMoveDir = 0;
+    this.aiDecisionTimer = 0;
+    this.hitProjectiles.clear();
+
+    // Destroy any lingering projectiles from previous round
+    this.projectiles.clear(true, true);
 
     // Reset health and positions
     this.playerHp = this.playerMaxHp;
@@ -247,8 +276,32 @@ export class DesiFightersScene extends Phaser.Scene {
   }
 
   private finishRound(winner: 'player' | 'opponent' | 'draw', bannerTitle: string) {
+    // ---------------------------------------------------------------
+    // FIX: Guard against double-finish (can be called by K.O. and
+    // then timer simultaneously — only execute once)
+    // ---------------------------------------------------------------
+    if (!this.isRoundActive && bannerTitle === 'K.O.!') return;
     this.isRoundActive = false;
-    if (this.roundTimerEvent) this.roundTimerEvent.remove();
+
+    if (this.roundTimerEvent) {
+      this.roundTimerEvent.remove();
+      this.roundTimerEvent = undefined;
+    }
+
+    // ---------------------------------------------------------------
+    // FIX: Immediately clear all attack/stun locks so sprites don't
+    // stay frozen during the end-of-round display
+    // ---------------------------------------------------------------
+    this.isPlayerAttacking = false;
+    this.isOppAttacking = false;
+    this.playerHitStun = 0;
+    this.oppHitStun = 0;
+    this.isPlayerBlocking = false;
+    this.isOppBlocking = false;
+    this.playerSprite.setVelocity(0, 0);
+    this.oppSprite.setVelocity(0, 0);
+    this.projectiles.clear(true, true);
+    this.hitProjectiles.clear();
 
     this.roundResults.push({
       roundNumber: this.currentRound,
@@ -307,7 +360,7 @@ export class DesiFightersScene extends Phaser.Scene {
   // -------------------------------------------------------------
   // UPDATE LOOP: Movement, AI, Hit-stuns, Direction Facing
   // -------------------------------------------------------------
-  update(time: number, delta: number) {
+  update(_time: number, delta: number) {
     if (!this.isRoundActive) return;
 
     // Decrement Hit Stun and Cooldowns
@@ -316,12 +369,16 @@ export class DesiFightersScene extends Phaser.Scene {
     if (this.playerAttackCooldown > 0) this.playerAttackCooldown -= delta;
     if (this.oppAttackCooldown > 0) this.oppAttackCooldown -= delta;
 
-    // Attack Watchdogs (failsafe against any freeze/lock)
+    // ---------------------------------------------------------------
+    // FIX: Attack watchdog timeout reduced to 500ms for specials/ults
+    // (prev value was 380ms which was too short for ult animations)
+    // ---------------------------------------------------------------
     if (this.isPlayerAttacking) {
       this.playerAttackTimer += delta;
-      if (this.playerAttackTimer > 380) {
+      if (this.playerAttackTimer > 700) {
         this.isPlayerAttacking = false;
         this.playerAttackTimer = 0;
+        this.playerSprite.setVelocityX(0);
       }
     } else {
       this.playerAttackTimer = 0;
@@ -329,12 +386,25 @@ export class DesiFightersScene extends Phaser.Scene {
 
     if (this.isOppAttacking) {
       this.oppAttackTimer += delta;
-      if (this.oppAttackTimer > 380) {
+      if (this.oppAttackTimer > 700) {
         this.isOppAttacking = false;
         this.oppAttackTimer = 0;
+        this.oppSprite.setVelocityX(0);
       }
     } else {
       this.oppAttackTimer = 0;
+    }
+
+    // ---------------------------------------------------------------
+    // FIX: Auto-stop velocity at world edges to prevent corner lock
+    // ---------------------------------------------------------------
+    const pw = this.playerSprite.body as Phaser.Physics.Arcade.Body;
+    const ow = this.oppSprite.body as Phaser.Physics.Arcade.Body;
+    if (pw?.blocked.left || pw?.blocked.right) {
+      this.playerSprite.setVelocityX(0);
+    }
+    if (ow?.blocked.left || ow?.blocked.right) {
+      this.oppSprite.setVelocityX(0);
     }
 
     // 1. Automatic Face Direction (Face opponent)
@@ -350,6 +420,17 @@ export class DesiFightersScene extends Phaser.Scene {
 
     // 3. AI Opponent Logic
     this.updateOpponentAI(delta);
+
+    // ---------------------------------------------------------------
+    // FIX: Destroy any projectiles that have gone off-screen
+    // ---------------------------------------------------------------
+    this.projectiles.getChildren().forEach((obj) => {
+      const p = obj as Phaser.Physics.Arcade.Sprite;
+      if (p.active && (p.x < -60 || p.x > 540 || p.y < -60 || p.y > 750)) {
+        this.hitProjectiles.delete(p);
+        p.destroy();
+      }
+    });
   }
 
   // -------------------------------------------------------------
@@ -384,7 +465,10 @@ export class DesiFightersScene extends Phaser.Scene {
     this.playerSprite.setVelocityX(moveX);
 
     // Jump (W or Arrow Up or Space or touch)
-    const keyJump = (this.keyW && this.keyW.isDown) || (this.cursors && this.cursors.up.isDown) || (this.keySpace && this.keySpace.isDown);
+    const keyJump =
+      (this.keyW && this.keyW.isDown) ||
+      (this.cursors && this.cursors.up.isDown) ||
+      (this.keySpace && this.keySpace.isDown);
     const isGrounded = this.playerSprite.body?.touching.down;
     if (keyJump && isGrounded) {
       this.triggerPlayerJump();
@@ -458,6 +542,7 @@ export class DesiFightersScene extends Phaser.Scene {
 
     // Hit Range Check (within ~85px)
     this.time.delayedCall(100, () => {
+      if (!this.isRoundActive) return;
       this.checkMeleeHit(attacker, 'punch', 85, 30);
     });
 
@@ -481,6 +566,7 @@ export class DesiFightersScene extends Phaser.Scene {
 
     // Hit Range Check (within ~105px)
     this.time.delayedCall(140, () => {
+      if (!this.isRoundActive) return;
       this.checkMeleeHit(attacker, 'kick', 105, 52);
     });
 
@@ -502,7 +588,11 @@ export class DesiFightersScene extends Phaser.Scene {
     sprite.setTexture(`fighter_${def.id}_special`);
     fighterAudio.playSpecial();
 
-    // Character Signature Behavior
+    const clearAttacking = () => {
+      if (isPlayer) this.isPlayerAttacking = false;
+      else this.isOppAttacking = false;
+    };
+
     if (def.id === 'jaldi') {
       // LATE ENTRY: Hyper Speed Dash across stage
       const forwardDir = sprite.x < target.x ? 1 : -1;
@@ -510,14 +600,18 @@ export class DesiFightersScene extends Phaser.Scene {
       this.spawnClockEffect(sprite.x, sprite.y);
 
       this.time.delayedCall(180, () => {
+        if (!this.isRoundActive) { clearAttacking(); return; }
         this.checkMeleeHit(attacker, 'special', 180, 130, 'comic_late');
       });
 
       this.time.delayedCall(400, () => {
+        // ---------------------------------------------------------------
+        // FIX: Always clear velocity and flag even if round ended
+        // ---------------------------------------------------------------
         sprite.setVelocityX(0);
-        if (isPlayer) this.isPlayerAttacking = false;
-        else this.isOppAttacking = false;
+        clearAttacking();
       });
+
     } else if (def.id === 'pookie') {
       // POOKIE SHUFFLE: Cute erratic dance glide + flurry kick
       fighterAudio.playSparkles();
@@ -526,41 +620,48 @@ export class DesiFightersScene extends Phaser.Scene {
       sprite.setVelocityX(forwardDir * 280);
 
       this.time.delayedCall(220, () => {
+        if (!this.isRoundActive) { clearAttacking(); return; }
         this.checkMeleeHit(attacker, 'special', 120, 125, 'comic_pookie');
       });
 
       this.time.delayedCall(480, () => {
         sprite.setVelocityX(0);
-        if (isPlayer) this.isPlayerAttacking = false;
-        else this.isOppAttacking = false;
+        clearAttacking();
       });
+
     } else if (def.id === 'guard') {
       // ENTRY DENIED: Whistle + Energy barrier push
       fighterAudio.playWhistle();
       const barrierX = sprite.x + (sprite.x < target.x ? 45 : -45);
       const barrier = this.add.image(barrierX, sprite.y - 10, 'fx_barrier');
 
-      this.checkMeleeHit(attacker, 'special', 130, 110, 'comic_denied');
+      // ---------------------------------------------------------------
+      // FIX: Guard the hit check with isRoundActive
+      // ---------------------------------------------------------------
+      if (this.isRoundActive) {
+        this.checkMeleeHit(attacker, 'special', 130, 110, 'comic_denied');
+      }
 
       this.time.delayedCall(500, () => {
-        barrier.destroy();
-        if (isPlayer) this.isPlayerAttacking = false;
-        else this.isOppAttacking = false;
+        if (barrier && barrier.active) barrier.destroy();
+        clearAttacking();
       });
+
     } else if (def.id === 'vadapav') {
       // CHUTNEY BLAST: Launch Chutney Projectile
       fighterAudio.playSplash();
       const projX = sprite.x + (sprite.x < target.x ? 35 : -35);
       const proj = this.projectiles.create(projX, sprite.y - 15, 'proj_chutney') as Phaser.Physics.Arcade.Sprite;
-      const projDir = sprite.x < target.x ? 1 : -1;
-      proj.setVelocityX(projDir * 360);
-      proj.setData('owner', attacker);
-      proj.setData('damage', 135);
-      proj.setData('comicText', 'comic_spicy');
+      if (proj && proj.active) {
+        const projDir = sprite.x < target.x ? 1 : -1;
+        proj.setVelocityX(projDir * 360);
+        proj.setData('owner', attacker);
+        proj.setData('damage', 135);
+        proj.setData('comicText', 'comic_spicy');
+      }
 
       this.time.delayedCall(380, () => {
-        if (isPlayer) this.isPlayerAttacking = false;
-        else this.isOppAttacking = false;
+        clearAttacking();
       });
     }
   }
@@ -579,34 +680,54 @@ export class DesiFightersScene extends Phaser.Scene {
 
     sprite.setTexture(`fighter_${def.id}_special`);
 
+    const clearAttacking = () => {
+      // ---------------------------------------------------------------
+      // FIX: Always stop dash velocity when ultimate ends
+      // ---------------------------------------------------------------
+      sprite.setVelocityX(0);
+      if (isPlayer) this.isPlayerAttacking = false;
+      else this.isOppAttacking = false;
+    };
+
     if (def.id === 'vadapav') {
       // VADA PAV VOLCANO: Launch 3 giant flying Vada Pavs!
       for (let i = 0; i < 3; i++) {
         this.time.delayedCall(i * 180, () => {
+          // ---------------------------------------------------------------
+          // FIX: Guard projectile creation — only if round still active
+          // ---------------------------------------------------------------
+          if (!this.isRoundActive && i > 0) return;
+          // Capture target position at time of launch so it can't be undefined
+          const targetX = target.x;
+          const projDir = sprite.x < targetX ? 1 : -1;
           const p = this.projectiles.create(sprite.x, sprite.y - 20, 'proj_vadapav') as Phaser.Physics.Arcade.Sprite;
-          const pDir = sprite.x < target.x ? 1 : -1;
-          p.setVelocityX(pDir * (300 + i * 40));
-          p.setVelocityY(-40 + i * 20);
-          p.setData('owner', attacker);
-          p.setData('damage', 80);
-          p.setData('comicText', 'comic_dhishoom');
+          if (p && p.active) {
+            p.setVelocityX(projDir * (300 + i * 40));
+            p.setVelocityY(-40 + i * 20);
+            p.setData('owner', attacker);
+            p.setData('damage', 80);
+            p.setData('comicText', 'comic_dhishoom');
+          }
         });
       }
     } else {
-      // Cinematic Multi-hit Dash Barrage
+      // Cinematic Multi-hit Dash Barrage (Jaldi / Pookie / Guard)
       const forwardDir = sprite.x < target.x ? 1 : -1;
       sprite.setVelocityX(forwardDir * 420);
 
       this.time.delayedCall(300, () => {
+        if (!this.isRoundActive) { clearAttacking(); return; }
         this.checkMeleeHit(attacker, 'ultimate', 180, 240, 'comic_dhishoom');
         this.cameras.main.shake(250, 0.015);
       });
     }
 
-    this.time.delayedCall(600, () => {
-      sprite.setVelocityX(0);
-      if (isPlayer) this.isPlayerAttacking = false;
-      else this.isOppAttacking = false;
+    // ---------------------------------------------------------------
+    // FIX: clearAttacking fires regardless of round state so the lock
+    // is always released (600ms covers all attack branches)
+    // ---------------------------------------------------------------
+    this.time.delayedCall(650, () => {
+      clearAttacking();
     });
   }
 
@@ -620,6 +741,11 @@ export class DesiFightersScene extends Phaser.Scene {
     baseDmg: number,
     specialComicText?: string
   ) {
+    // ---------------------------------------------------------------
+    // FIX: Early exit if round ended between attack start and hit check
+    // ---------------------------------------------------------------
+    if (!this.isRoundActive) return;
+
     const isPlayer = attacker === 'player';
     const atkSprite = isPlayer ? this.playerSprite : this.oppSprite;
     const defSprite = isPlayer ? this.oppSprite : this.playerSprite;
@@ -636,7 +762,7 @@ export class DesiFightersScene extends Phaser.Scene {
       // Calculate Damage
       const atkPower = atkDef.stats.attack / 75;
       const defResist = isDefBlocking ? 0.22 * (1 - defDef.stats.defence / 250) : 1;
-      let finalDamage = Math.round(baseDmg * atkPower * defResist);
+      const finalDamage = Math.round(baseDmg * atkPower * defResist);
 
       // Camera Shake for impact
       if (attackType === 'special' || attackType === 'ultimate') {
@@ -653,24 +779,27 @@ export class DesiFightersScene extends Phaser.Scene {
         this.oppHp = Math.max(0, this.oppHp - finalDamage);
         this.totalDamageDealt += finalDamage;
         this.oppHitStun = isDefBlocking ? 120 : 320;
-        this.isOppAttacking = false; // Cancel any opponent attack locks immediately
+        this.isOppAttacking = false;
         this.oppAttackTimer = 0;
-        this.oppSprite.setVelocityX(atkSprite.x < defSprite.x ? 180 : -180);
+        // ---------------------------------------------------------------
+        // FIX: Clamp knockback so fighter doesn't clip into wall and stick
+        // ---------------------------------------------------------------
+        const knockDir = atkSprite.x < defSprite.x ? 1 : -1;
+        this.oppSprite.setVelocityX(knockDir * 180);
         this.oppSprite.setTexture(`fighter_${this.oppDef.id}_hit`);
 
-        // Build Energy on successful hit
         this.playerSpecialEnergy = Math.min(100, this.playerSpecialEnergy + (attackType === 'punch' ? 14 : 18));
         this.playerUltEnergy = Math.min(100, this.playerUltEnergy + (attackType === 'punch' ? 10 : 15));
       } else {
         this.playerHp = Math.max(0, this.playerHp - finalDamage);
         this.totalDamageTaken += finalDamage;
         this.playerHitStun = isDefBlocking ? 120 : 320;
-        this.isPlayerAttacking = false; // Cancel any player attack locks immediately
+        this.isPlayerAttacking = false;
         this.playerAttackTimer = 0;
-        this.playerSprite.setVelocityX(atkSprite.x < defSprite.x ? 180 : -180);
+        const knockDir = atkSprite.x < defSprite.x ? 1 : -1;
+        this.playerSprite.setVelocityX(knockDir * 180);
         this.playerSprite.setTexture(`fighter_${this.playerDef.id}_hit`);
 
-        // Opponent Energy
         this.oppSpecialEnergy = Math.min(100, this.oppSpecialEnergy + (attackType === 'punch' ? 14 : 18));
         this.oppUltEnergy = Math.min(100, this.oppUltEnergy + (attackType === 'punch' ? 10 : 15));
       }
@@ -701,20 +830,38 @@ export class DesiFightersScene extends Phaser.Scene {
     }
   }
 
+  // ---------------------------------------------------------------
+  // FIX: Projectile hit — mark as hit immediately to block re-entry,
+  // then safely read position before destroy(), guard all sprite calls
+  // ---------------------------------------------------------------
   private handleProjectileHit(proj: Phaser.Physics.Arcade.Sprite, defender: 'player' | 'opponent') {
+    if (!proj.active) return;
+
     const owner = proj.getData('owner');
     if (owner === defender) return; // Don't hit self
 
+    // Mark as consumed immediately to prevent double-hit
+    this.hitProjectiles.add(proj);
+
     const dmg = proj.getData('damage') || 100;
     const comicKey = proj.getData('comicText') || 'comic_dhishoom';
+
+    // Capture position BEFORE destroy
     const hitX = proj.x;
     const hitY = proj.y;
+
     proj.destroy();
+
+    if (!this.isRoundActive) return;
 
     fighterAudio.playSplash();
     this.spawnComicBurst(hitX, hitY, comicKey);
 
     if (defender === 'opponent') {
+      // ---------------------------------------------------------------
+      // FIX: Null-check oppSprite before calling physics methods
+      // ---------------------------------------------------------------
+      if (!this.oppSprite || !this.oppSprite.active) return;
       const isBlock = this.isOppBlocking;
       const finalDmg = isBlock ? Math.round(dmg * 0.3) : dmg;
       this.oppHp = Math.max(0, this.oppHp - finalDmg);
@@ -722,10 +869,18 @@ export class DesiFightersScene extends Phaser.Scene {
       this.oppHitStun = 350;
       this.isOppAttacking = false;
       this.oppAttackTimer = 0;
-      this.oppSprite.setVelocityX(hitX < this.oppSprite.x ? 220 : -220);
+      const knockDir = hitX < this.oppSprite.x ? 1 : -1;
+      this.oppSprite.setVelocityX(knockDir * 220);
       this.oppSprite.setTexture(`fighter_${this.oppDef.id}_hit`);
       this.spawnDamageNumber(hitX, hitY, finalDmg, true);
+
+      this.playerSpecialEnergy = Math.min(100, this.playerSpecialEnergy + 20);
+      this.playerUltEnergy = Math.min(100, this.playerUltEnergy + 16);
     } else {
+      // ---------------------------------------------------------------
+      // FIX: Null-check playerSprite before calling physics methods
+      // ---------------------------------------------------------------
+      if (!this.playerSprite || !this.playerSprite.active) return;
       const isBlock = this.isPlayerBlocking;
       const finalDmg = isBlock ? Math.round(dmg * 0.3) : dmg;
       this.playerHp = Math.max(0, this.playerHp - finalDmg);
@@ -733,17 +888,24 @@ export class DesiFightersScene extends Phaser.Scene {
       this.playerHitStun = 350;
       this.isPlayerAttacking = false;
       this.playerAttackTimer = 0;
-      this.playerSprite.setVelocityX(hitX < this.playerSprite.x ? 220 : -220);
+      const knockDir = hitX < this.playerSprite.x ? 1 : -1;
+      this.playerSprite.setVelocityX(knockDir * 220);
       this.playerSprite.setTexture(`fighter_${this.playerDef.id}_hit`);
       this.spawnDamageNumber(hitX, hitY, finalDmg, true);
+
+      this.oppSpecialEnergy = Math.min(100, this.oppSpecialEnergy + 20);
+      this.oppUltEnergy = Math.min(100, this.oppUltEnergy + 16);
     }
 
     this.callbacks.onHealthUpdate(this.playerHp, this.playerMaxHp, this.oppHp, this.oppMaxHp);
+    this.callbacks.onEnergyUpdate(this.playerSpecialEnergy, this.playerUltEnergy, this.oppSpecialEnergy, this.oppUltEnergy);
 
     if (this.oppHp <= 0) {
+      this.oppSprite.setTexture(`fighter_${this.oppDef.id}_ko`);
       this.playerRoundWins++;
       this.finishRound('player', 'K.O.!');
     } else if (this.playerHp <= 0) {
+      this.playerSprite.setTexture(`fighter_${this.playerDef.id}_ko`);
       this.oppRoundWins++;
       this.finishRound('opponent', 'K.O.!');
     }
@@ -825,6 +987,11 @@ export class DesiFightersScene extends Phaser.Scene {
   // STATE-BASED AI OPPONENT CONTROLLER
   // -------------------------------------------------------------
   private updateOpponentAI(delta: number) {
+    // ---------------------------------------------------------------
+    // FIX: Hard-gate AI on isRoundActive to prevent specials/ults
+    // from firing after K.O. or after round ends
+    // ---------------------------------------------------------------
+    if (!this.isRoundActive) return;
     if (this.oppHitStun > 0 || this.isOppAttacking) return;
 
     this.aiDecisionTimer -= delta;
@@ -880,7 +1047,6 @@ export class DesiFightersScene extends Phaser.Scene {
     // 4. Mid / Far Range Navigation
     const dirToPlayer = this.playerSprite.x < this.oppSprite.x ? -1 : 1;
 
-    // Character Personality Twists
     if (this.oppDef.id === 'guard' && Math.random() < 0.3) {
       // Guard holds ground defensively
       this.oppSprite.setVelocityX(0);
