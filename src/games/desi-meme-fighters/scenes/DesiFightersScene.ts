@@ -110,9 +110,10 @@ export class DesiFightersScene extends Phaser.Scene {
     // 1. Background Arena
     this.add.image(240, 360, 'fighter_arena_bg').setOrigin(0.5, 0.5);
 
-    // 2. Arena Floor Platform (y = 430)
+    // 2. Arena Floor Platform: Solid 310px deep bedrock platform (y = 430 to 740)
+    // Ensures fighters can NEVER tunnel or fall below the stage floor!
     this.ground = this.physics.add.staticGroup();
-    const floorBar = this.add.rectangle(240, 440, 480, 20, 0x000000, 0);
+    const floorBar = this.add.rectangle(240, 585, 480, 310, 0x000000, 0);
     this.ground.add(floorBar);
 
     // 3. Projectiles Group (no gravity)
@@ -195,8 +196,16 @@ export class DesiFightersScene extends Phaser.Scene {
     this.isRoundActive = false;
 
     // ---------------------------------------------------------------
-    // FIX: Full state reset on round start — clears all locks
+    // FIX: Remove ALL pending timers from previous rounds so stale
+    // delayedCall callbacks (attack hits, clearAttacking, projectiles)
+    // can never fire into a new round
     // ---------------------------------------------------------------
+    this.time.removeAllEvents();
+    if (this.roundTimerEvent) {
+      this.roundTimerEvent = undefined;
+    }
+
+    // Full state reset on round start — clears all locks
     this.roundTimeRemaining = 60;
     this.isPlayerAttacking = false;
     this.isOppAttacking = false;
@@ -243,7 +252,6 @@ export class DesiFightersScene extends Phaser.Scene {
       this.isRoundActive = true;
 
       // Start 60s countdown timer
-      if (this.roundTimerEvent) this.roundTimerEvent.remove();
       this.roundTimerEvent = this.time.addEvent({
         delay: 1000,
         repeat: 59,
@@ -277,16 +285,21 @@ export class DesiFightersScene extends Phaser.Scene {
 
   private finishRound(winner: 'player' | 'opponent' | 'draw', bannerTitle: string) {
     // ---------------------------------------------------------------
-    // FIX: Guard against double-finish (can be called by K.O. and
-    // then timer simultaneously — only execute once)
+    // FIX: Unconditional guard — finishRound must only run once per
+    // round regardless of what triggered it (K.O., TIME UP, both
+    // simultaneously). Previous narrow guard only blocked K.O. repeats.
     // ---------------------------------------------------------------
-    if (!this.isRoundActive && bannerTitle === 'K.O.!') return;
+    if (!this.isRoundActive) return;
     this.isRoundActive = false;
 
+    // Stop the round timer and cancel ALL pending delayedCall timers
+    // (attack callbacks, clearAttacking closures, projectile spawners)
+    // so nothing from THIS round leaks into the next round.
     if (this.roundTimerEvent) {
       this.roundTimerEvent.remove();
       this.roundTimerEvent = undefined;
     }
+    this.time.removeAllEvents();
 
     // ---------------------------------------------------------------
     // FIX: Immediately clear all attack/stun locks so sprites don't
@@ -382,14 +395,31 @@ export class DesiFightersScene extends Phaser.Scene {
     if (!this.isRoundActive) return;
 
     // Decrement Hit Stun and Cooldowns
-    if (this.playerHitStun > 0) this.playerHitStun -= delta;
-    if (this.oppHitStun > 0) this.oppHitStun -= delta;
+    if (this.playerHitStun > 0) {
+      this.playerHitStun -= delta;
+      if (this.playerHitStun <= 0) {
+        this.playerHitStun = 0;
+        this.playerSprite.setVelocityX(0);
+        if (!this.isPlayerAttacking && !this.isPlayerBlocking) {
+          this.playerSprite.setTexture(`fighter_${this.playerDef.id}_idle`);
+        }
+      }
+    }
+    if (this.oppHitStun > 0) {
+      this.oppHitStun -= delta;
+      if (this.oppHitStun <= 0) {
+        this.oppHitStun = 0;
+        this.oppSprite.setVelocityX(0);
+        if (!this.isOppAttacking && !this.isOppBlocking) {
+          this.oppSprite.setTexture(`fighter_${this.oppDef.id}_idle`);
+        }
+      }
+    }
     if (this.playerAttackCooldown > 0) this.playerAttackCooldown -= delta;
     if (this.oppAttackCooldown > 0) this.oppAttackCooldown -= delta;
 
     // ---------------------------------------------------------------
-    // FIX: Attack watchdog timeout reduced to 500ms for specials/ults
-    // (prev value was 380ms which was too short for ult animations)
+    // FIX: Attack watchdog timeout for specials/ults (700ms)
     // ---------------------------------------------------------------
     if (this.isPlayerAttacking) {
       this.playerAttackTimer += delta;
@@ -397,6 +427,7 @@ export class DesiFightersScene extends Phaser.Scene {
         this.isPlayerAttacking = false;
         this.playerAttackTimer = 0;
         this.playerSprite.setVelocityX(0);
+        this.playerSprite.setTexture(`fighter_${this.playerDef.id}_idle`);
       }
     } else {
       this.playerAttackTimer = 0;
@@ -408,6 +439,7 @@ export class DesiFightersScene extends Phaser.Scene {
         this.isOppAttacking = false;
         this.oppAttackTimer = 0;
         this.oppSprite.setVelocityX(0);
+        this.oppSprite.setTexture(`fighter_${this.oppDef.id}_idle`);
       }
     } else {
       this.oppAttackTimer = 0;
@@ -423,6 +455,43 @@ export class DesiFightersScene extends Phaser.Scene {
     }
     if (ow?.blocked.left || ow?.blocked.right) {
       this.oppSprite.setVelocityX(0);
+    }
+
+    // ---------------------------------------------------------------
+    // UNBREAKABLE POSITION BOUNDING:
+    // Guarantees characters can NEVER fall below stage or leave view
+    // ---------------------------------------------------------------
+    if (this.playerSprite.y > 380) {
+      this.playerSprite.setY(380);
+      this.playerSprite.setVelocityY(0);
+    }
+    if (this.oppSprite.y > 380) {
+      this.oppSprite.setY(380);
+      this.oppSprite.setVelocityY(0);
+    }
+    if (this.playerSprite.x < 35) {
+      this.playerSprite.setX(35);
+      if (this.playerSprite.body && this.playerSprite.body.velocity.x < 0) {
+        this.playerSprite.setVelocityX(0);
+      }
+    }
+    if (this.playerSprite.x > 445) {
+      this.playerSprite.setX(445);
+      if (this.playerSprite.body && this.playerSprite.body.velocity.x > 0) {
+        this.playerSprite.setVelocityX(0);
+      }
+    }
+    if (this.oppSprite.x < 35) {
+      this.oppSprite.setX(35);
+      if (this.oppSprite.body && this.oppSprite.body.velocity.x < 0) {
+        this.oppSprite.setVelocityX(0);
+      }
+    }
+    if (this.oppSprite.x > 445) {
+      this.oppSprite.setX(445);
+      if (this.oppSprite.body && this.oppSprite.body.velocity.x > 0) {
+        this.oppSprite.setVelocityX(0);
+      }
     }
 
     // 1. Automatic Face Direction (Face opponent)
@@ -573,6 +642,7 @@ export class DesiFightersScene extends Phaser.Scene {
 
     // Reset back to idle
     this.time.delayedCall(260, () => {
+      if (sprite && sprite.active) sprite.setTexture(`fighter_${def.id}_idle`);
       if (isPlayer) this.isPlayerAttacking = false;
       else this.isOppAttacking = false;
     });
@@ -598,6 +668,7 @@ export class DesiFightersScene extends Phaser.Scene {
 
     // Reset back to idle
     this.time.delayedCall(360, () => {
+      if (sprite && sprite.active) sprite.setTexture(`fighter_${def.id}_idle`);
       if (isPlayer) this.isPlayerAttacking = false;
       else this.isOppAttacking = false;
     });
@@ -616,12 +687,16 @@ export class DesiFightersScene extends Phaser.Scene {
     fighterAudio.playSpecial();
 
     const clearAttacking = () => {
+      if (sprite && sprite.active) sprite.setTexture(`fighter_${def.id}_idle`);
       if (isPlayer) this.isPlayerAttacking = false;
       else this.isOppAttacking = false;
     };
     // Safe velocity clear — only if sprite is still alive
     const safeStopSprite = () => {
-      if (sprite && sprite.active && sprite.body) sprite.setVelocityX(0);
+      if (sprite && sprite.active && sprite.body) {
+        sprite.setVelocityX(0);
+        sprite.setTexture(`fighter_${def.id}_idle`);
+      }
       clearAttacking();
     };
 
@@ -713,10 +788,13 @@ export class DesiFightersScene extends Phaser.Scene {
 
     const clearAttacking = () => {
       // ---------------------------------------------------------------
-      // FIX: Always stop dash velocity when ultimate ends
+      // FIX: Always stop dash velocity and reset to idle when ultimate ends
       // Safe-guard: sprite may be gone if Phaser was destroyed
       // ---------------------------------------------------------------
-      if (sprite && sprite.active && sprite.body) sprite.setVelocityX(0);
+      if (sprite && sprite.active && sprite.body) {
+        sprite.setVelocityX(0);
+        sprite.setTexture(`fighter_${def.id}_idle`);
+      }
       if (isPlayer) this.isPlayerAttacking = false;
       else this.isOppAttacking = false;
     };
@@ -1037,18 +1115,19 @@ export class DesiFightersScene extends Phaser.Scene {
 
     const dist = Math.abs(this.playerSprite.x - this.oppSprite.x);
     const oppSpeed = 150 * (this.oppDef.stats.speed / 75);
+    const isGrounded = !!this.oppSprite.body?.touching.down;
 
-    // 1. Ultimate Trigger if Meter Full
-    if (this.oppUltEnergy >= 100 && Math.random() < 0.75) {
+    // 1. Ultimate Trigger if Meter Full (grounded only)
+    if (isGrounded && this.oppUltEnergy >= 100 && Math.random() < 0.75) {
       this.oppUltEnergy = 0;
       this.callbacks.onEnergyUpdate(this.playerSpecialEnergy, this.playerUltEnergy, this.oppSpecialEnergy, this.oppUltEnergy);
       this.executeUltimate('opponent', this.oppDef);
       return;
     }
 
-    // 2. Special Move Check
+    // 2. Special Move Check (grounded only)
     const specCost = this.oppDef.specialMove.energyCost;
-    if (this.oppSpecialEnergy >= specCost && Math.random() < 0.5) {
+    if (isGrounded && this.oppSpecialEnergy >= specCost && Math.random() < 0.5) {
       this.oppSpecialEnergy -= specCost;
       this.callbacks.onEnergyUpdate(this.playerSpecialEnergy, this.playerUltEnergy, this.oppSpecialEnergy, this.oppUltEnergy);
       this.executeSpecial('opponent', this.oppDef);
