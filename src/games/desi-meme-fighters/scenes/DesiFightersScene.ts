@@ -358,9 +358,27 @@ export class DesiFightersScene extends Phaser.Scene {
   }
 
   // -------------------------------------------------------------
+  // SAFETY: Single guard used everywhere to protect against
+  // Phaser's extra rAF tick after Game.destroy() and against
+  // React touch events firing into an already-torn-down scene
+  // -------------------------------------------------------------
+  private spritesAlive(): boolean {
+    return !!(
+      this.playerSprite &&
+      this.playerSprite.active &&
+      this.playerSprite.body &&
+      this.oppSprite &&
+      this.oppSprite.active &&
+      this.oppSprite.body
+    );
+  }
+
+  // -------------------------------------------------------------
   // UPDATE LOOP: Movement, AI, Hit-stuns, Direction Facing
   // -------------------------------------------------------------
   update(_time: number, delta: number) {
+    // Guard: scene may still get a rAF tick after Phaser Game.destroy()
+    if (!this.spritesAlive()) return;
     if (!this.isRoundActive) return;
 
     // Decrement Hit Stun and Cooldowns
@@ -437,6 +455,7 @@ export class DesiFightersScene extends Phaser.Scene {
   // PLAYER MOVEMENT & ACTIONS
   // -------------------------------------------------------------
   private updatePlayerMovement() {
+    if (!this.spritesAlive()) return;
     if (this.playerHitStun > 0 || this.isPlayerAttacking) return;
 
     const baseSpeed = 160 * (this.playerDef.stats.speed / 75);
@@ -485,6 +504,7 @@ export class DesiFightersScene extends Phaser.Scene {
   }
 
   public triggerPlayerJump() {
+    if (!this.spritesAlive()) return;
     if (!this.isRoundActive || this.playerHitStun > 0 || this.isPlayerAttacking) return;
     if (this.playerSprite.body?.touching.down) {
       this.playerSprite.setVelocityY(-460);
@@ -496,16 +516,19 @@ export class DesiFightersScene extends Phaser.Scene {
   // ATTACKS: PUNCH, KICK, SPECIAL, ULTIMATE
   // -------------------------------------------------------------
   public handlePlayerPunch() {
+    if (!this.spritesAlive()) return;
     if (!this.isRoundActive || this.playerHitStun > 0 || this.isPlayerAttacking || this.isPlayerBlocking) return;
     this.executePunch('player');
   }
 
   public handlePlayerKick() {
+    if (!this.spritesAlive()) return;
     if (!this.isRoundActive || this.playerHitStun > 0 || this.isPlayerAttacking || this.isPlayerBlocking) return;
     this.executeKick('player');
   }
 
   public handlePlayerSpecial() {
+    if (!this.spritesAlive()) return;
     if (!this.isRoundActive || this.playerHitStun > 0 || this.isPlayerAttacking) return;
     const cost = this.playerDef.specialMove.energyCost;
     if (this.playerSpecialEnergy < cost) return;
@@ -517,6 +540,7 @@ export class DesiFightersScene extends Phaser.Scene {
   }
 
   public handlePlayerUltimate() {
+    if (!this.spritesAlive()) return;
     if (!this.isRoundActive || this.playerHitStun > 0 || this.isPlayerAttacking) return;
     if (this.playerUltEnergy < 100) return;
 
@@ -530,6 +554,7 @@ export class DesiFightersScene extends Phaser.Scene {
   // CORE COMBAT EXECUTION LOGIC
   // -------------------------------------------------------------
   private executePunch(attacker: 'player' | 'opponent') {
+    if (!this.spritesAlive()) return;
     const isPlayer = attacker === 'player';
     const sprite = isPlayer ? this.playerSprite : this.oppSprite;
     const def = isPlayer ? this.playerDef : this.oppDef;
@@ -554,6 +579,7 @@ export class DesiFightersScene extends Phaser.Scene {
   }
 
   private executeKick(attacker: 'player' | 'opponent') {
+    if (!this.spritesAlive()) return;
     const isPlayer = attacker === 'player';
     const sprite = isPlayer ? this.playerSprite : this.oppSprite;
     const def = isPlayer ? this.playerDef : this.oppDef;
@@ -578,6 +604,7 @@ export class DesiFightersScene extends Phaser.Scene {
   }
 
   private executeSpecial(attacker: 'player' | 'opponent', def: FighterDefinition) {
+    if (!this.spritesAlive()) return;
     const isPlayer = attacker === 'player';
     const sprite = isPlayer ? this.playerSprite : this.oppSprite;
     const target = isPlayer ? this.oppSprite : this.playerSprite;
@@ -591,6 +618,11 @@ export class DesiFightersScene extends Phaser.Scene {
     const clearAttacking = () => {
       if (isPlayer) this.isPlayerAttacking = false;
       else this.isOppAttacking = false;
+    };
+    // Safe velocity clear — only if sprite is still alive
+    const safeStopSprite = () => {
+      if (sprite && sprite.active && sprite.body) sprite.setVelocityX(0);
+      clearAttacking();
     };
 
     if (def.id === 'jaldi') {
@@ -608,8 +640,7 @@ export class DesiFightersScene extends Phaser.Scene {
         // ---------------------------------------------------------------
         // FIX: Always clear velocity and flag even if round ended
         // ---------------------------------------------------------------
-        sprite.setVelocityX(0);
-        clearAttacking();
+        safeStopSprite();
       });
 
     } else if (def.id === 'pookie') {
@@ -625,8 +656,7 @@ export class DesiFightersScene extends Phaser.Scene {
       });
 
       this.time.delayedCall(480, () => {
-        sprite.setVelocityX(0);
-        clearAttacking();
+        safeStopSprite();
       });
 
     } else if (def.id === 'guard') {
@@ -667,6 +697,7 @@ export class DesiFightersScene extends Phaser.Scene {
   }
 
   private executeUltimate(attacker: 'player' | 'opponent', def: FighterDefinition) {
+    if (!this.spritesAlive()) return;
     const isPlayer = attacker === 'player';
     const sprite = isPlayer ? this.playerSprite : this.oppSprite;
     const target = isPlayer ? this.oppSprite : this.playerSprite;
@@ -683,8 +714,9 @@ export class DesiFightersScene extends Phaser.Scene {
     const clearAttacking = () => {
       // ---------------------------------------------------------------
       // FIX: Always stop dash velocity when ultimate ends
+      // Safe-guard: sprite may be gone if Phaser was destroyed
       // ---------------------------------------------------------------
-      sprite.setVelocityX(0);
+      if (sprite && sprite.active && sprite.body) sprite.setVelocityX(0);
       if (isPlayer) this.isPlayerAttacking = false;
       else this.isOppAttacking = false;
     };
@@ -694,9 +726,9 @@ export class DesiFightersScene extends Phaser.Scene {
       for (let i = 0; i < 3; i++) {
         this.time.delayedCall(i * 180, () => {
           // ---------------------------------------------------------------
-          // FIX: Guard projectile creation — only if round still active
+          // FIX: Guard projectile creation — only if round still active and sprites alive
           // ---------------------------------------------------------------
-          if (!this.isRoundActive && i > 0) return;
+          if (!this.isRoundActive || !this.spritesAlive()) return;
           // Capture target position at time of launch so it can't be undefined
           const targetX = target.x;
           const projDir = sprite.x < targetX ? 1 : -1;
@@ -745,6 +777,7 @@ export class DesiFightersScene extends Phaser.Scene {
     // FIX: Early exit if round ended between attack start and hit check
     // ---------------------------------------------------------------
     if (!this.isRoundActive) return;
+    if (!this.spritesAlive()) return;
 
     const isPlayer = attacker === 'player';
     const atkSprite = isPlayer ? this.playerSprite : this.oppSprite;
@@ -992,6 +1025,7 @@ export class DesiFightersScene extends Phaser.Scene {
     // from firing after K.O. or after round ends
     // ---------------------------------------------------------------
     if (!this.isRoundActive) return;
+    if (!this.spritesAlive()) return;
     if (this.oppHitStun > 0 || this.isOppAttacking) return;
 
     this.aiDecisionTimer -= delta;
